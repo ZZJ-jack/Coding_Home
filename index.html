@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coding</title>
+    <link rel="stylesheet" href="./css/home.settings.css">
+    <link rel="stylesheet" href="./css/all.settings.css">
+    <link rel="shortcut icon" href="img/ico/site-ico.ico">
+</head>
+<body>
+    <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
+    <cite class = "home-title" style = "position: absolute;
+                                        top:0px; 
+                                        left:0px;">
+    Home</cite>
+    <div id="welcome-text" class="welcome-text-body-page" style = "position: absolute;
+                                                                   top:0px; 
+                                                                   left:100px;">
+    </div>
+    <a class = "goto-link-botton" href="about.html" style = "position: absolute;
+                                                            top:10px; 
+                                                            left:1350px;"
+    >About</a>
+    <p id = "page-tail" class = "page-tail" style = "position: absolute;
+                                                        top:680px; 
+                                                        left:1150px;"
+    >Developed by</p>
+    <a  id = "page-tail" class = "page-tail" href = "https://zzjjack.us.kg" style = "position: absolute;
+                                                    top:695px; 
+                                                    left:1255px;"
+    >ZZJ</a>
+    <p id = "page-tail2" class = "page-tail" style = "position: absolute;
+                                                    top:680px; 
+                                                    left:1285px;"
+    >and Coding Team</p>
+    <p id = "page-tail3" class = "page-tail" style = "position: absolute;
+                                                    top:700px; 
+                                                    left:1310px;"
+    >2025, Coding</p>
+    <script>
+        welcome_text = "欢迎来到Coding团队的主页";
+        welcome_speed = 150; // 打字速度，单位毫秒
+        welcome_index = 0;
+        function welcome_typeWriter() {
+            if (welcome_index < welcome_text.length) {
+                document.getElementById("welcome-text").innerHTML += welcome_text.charAt(welcome_index);
+                welcome_index++;
+                setTimeout(welcome_typeWriter, welcome_speed);
+            }
+        }
+        welcome_typeWriter();
+    </script>
+    <script>
+    /**
+     * 初始化数字矩阵雨特效
+     * 实现原理：Canvas动画 + 随机字符生成
+     */
+    function createMatrixEffect() {
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 初始化画布尺寸（覆盖整个视口）
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // 字符配置
+        const config = {
+            fontSize: 15,               // 字符像素大小
+            fontFamily: 'MS Gothic',    // 等宽终端字体
+            charSet:"abcdefghijklmnopqrstuvwxyz", // 混合字符集
+            textColor: '#0F0'           // 经典绿色
+        };
+
+        // 计算列数（基于画布宽度和字体大小）
+        const columnCount = Math.floor(canvas.width / config.fontSize);
+        
+        // 初始化每列的Y轴起始位置
+        const verticalPositions = new Array(columnCount).fill(0);
+
+        /**
+         * 生成动画帧
+         */
+        function drawFrame() {
+            // 添加残影效果（透明度越低，拖影越短）
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 设置字体样式
+            ctx.fillStyle = config.textColor;
+            ctx.font = `${config.fontSize}px ${config.fontFamily}`;
+
+            // 逐列绘制字符
+            verticalPositions.forEach((yPos, index) => {
+                // 生成随机字符
+                const randomChar = config.charSet[
+                    Math.floor(Math.random() * config.charSet.length)
+                ];
+                
+                // 计算绘制坐标
+                const x = index * config.fontSize;
+                const y = yPos * config.fontSize;
+
+                // 绘制字符
+                ctx.fillText(randomChar, x, y);
+
+                // 控制字符流重置（2.5%概率重置）
+                if (y > canvas.height && Math.random() > 0.975) {
+                    verticalPositions[index] = 0;
+                }
+                
+                // 更新Y轴位置
+                verticalPositions[index] ++;
+            });
+
+            // 请求下一帧动画
+            requestAnimationFrame(drawFrame);
+        }
+
+        // 窗口尺寸变化监听
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // 启动动画
+        drawFrame();
+    }
+
+    // 页面加载后启动特效
+    window.addEventListener('load', createMatrixEffect);
+    </script>
+</body>
+</html>
