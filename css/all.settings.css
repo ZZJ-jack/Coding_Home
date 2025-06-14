@@ -1,0 +1,29 @@
+.matrix-canvas {
+    position: fixed;
+    opacity: 1;          /* 全局透明度 */
+    z-index: -1;             /* 置于内容层下方 */
+    pointer-events: none;   /* 禁用鼠标事件 */
+    left: 0;
+    top: 0;
+}
+.home-title {
+    color: #0080FF;
+    font-family: '宋体'; /* 等宽字体 */
+    font-size: 50px;
+    font-style: normal;
+    font-weight: bold;
+}
+.goto-link-botton {
+    color: #FFFF00;
+    font-family: '宋体'; /* 等宽字体 */
+    font-size: 25px;
+    font-style: normal;
+    text-decoration: none;
+}
+.page-tail {
+    color: #FFFFFF;
+    font-family: '宋体'; /* 等宽字体 */
+    font-size: 15px;
+    font-style: normal;
+    text-decoration: none;
+}

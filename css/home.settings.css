@@ -1,0 +1,12 @@
+.welcome-text-body-page {
+    font-family: monospace;
+    white-space: pre;
+    color: #85D0AF;
+    width: 70%;
+    height: 120px;
+    margin: 20px auto;          /* 上下边距20px，水平居中 */
+    padding: 20px;
+    border-radius: 8px;         /* 圆角 */
+    font-family: '宋体'; /* 等宽字体 */
+    font-size: 25px;
+}
