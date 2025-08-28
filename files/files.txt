@@ -1,4 +1,0 @@
-Pvz-2.3.5-Beta:https://gitee.com/zzj-jack/drive/releases/download/%E6%96%87%E4%BB%B6/PVZ-V2.3.5-Beta.zip
-五子棋:https://file-cdn.gitcode.com/5007944/releases/untagger_9be44872d0074f8fab86db085de55940/%E4%BA%94%E5%AD%90%E6%A3%8B.7z?auth_key=1756370486-6d3e4505783a4c7ea42417cbf79dd69a-0-d649f485d9fbc0853432571d1012b534cdf65f5dd23cccfbb6590cebeee10e9f
-小黑子跳悬崖:https://www.luogu.com.cn/api/team/downloadFile/x73qyzm9
-opticraft镜像网站:https://www.luogu.com.cn/api/team/downloadFile/lx7b18km
