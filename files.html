@@ -85,36 +85,37 @@
             
             .then(data => {
                 container.innerHTML = '';
-                const lines = data.trim().split('\n'); // 无需手动编解码操作
-
-                // 添加标题（优化中文显示）
+                
+                // 解析文件内容
+                const lines = data.trim().split('\n');
+                
+                // 添加标题
                 const title = document.createElement('h2');
-                title.textContent = `游戏文件 (${lines.length})`; // 修正中文冒号
+                title.textContent = `游戏文件 (${lines.length})`;
                 title.style.color = '#0f0';
-                title.style.marginMarginBottom = '20px';
+                title.style.marginBottom = '20px';
                 container.appendChild(title);
-
-                // 遍历文件行（支持中文文件名）
+                
+                // 遍历所有文件
                 lines.forEach(line => {
                     if (!line.trim()) return;
                     
-                    // 按第一个冒号分割文件名与URL（兼容中文路径）
-                    const separatorIndex = line.indexOf(':');
-                    if (separatorIndex === -1) return; // 无效行跳过
+                    // 按第一个冒号分割（防止URL中有多余冒号）
+                    const colonIndex = line.indexOf(':');
+                    if (colonIndex === -1) return;
                     
-                    const fileName = line.substring(0, separatorIndex).trim();
-                    const fileUrl = line.substring(separatorIndex + 1).trim();
+                    const fileName = line.substring(0, colonIndex);
+                    const fileUrl = line.substring(colonIndex + 1);
                     
-                    // 创建文件链接元素
-                    const fileLink = document.createElement('a');
-                    fileLink.href = fileUrl;
-                    fileLink.textContent = fileName;
-                    fileLink.target = '_blank';
-                    fileLink.className = 'file-link'; // 添加CSS类
+                    // 创建文件条目
+                    const link = document.createElement('a');
+                    link.className = 'file-entry';
+                    const encodedUrl = encodeURI(fileUrl); 
+                    link.href = encodedUrl;
+                    link.target = '_blank';
+                    link.innerHTML = `› ${fileName}`;
                     
-                    // 添加到容器（换行分隔）
-                    container.appendChild(fileLink);
-                    container.appendChild(document.createElement('br'));
+                    container.appendChild(link);
                 });
             })
             .catch(error => {
