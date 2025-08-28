@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- 标准网站图标声明 -->
+    <link rel="icon" href="img/ico/site-ico.png" type="image/x-icon"> 
+    <!-- 兼容旧版浏览器 -->
+    <link rel="shortcut icon" href="img/ico/site-ico.png">
+    <meta charset="UTF-8">
+    <!-- 兼容旧浏览器 -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!-- 强制IE浏览器使用最新渲染引擎 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>File</title>
+    <link rel="stylesheet" href="./css/all.settings.css">
+    <link rel="stylesheet" href="./css/file.settings.css">
+    <style>
+        .file-container {
+            background-color: rgba(0, 20, 0, 0.6); /* 半透明深绿色背景 */
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #0f0;
+            max-height: 600px;
+            overflow-y: auto;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+        .file-entry {
+            display: block;
+            padding: 12px;
+            margin-bottom: 8px;
+            color: #0f0;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            border-left: 3px solid #0f0;
+            transition: all 0.3s;
+        }
+        .file-entry:hover {
+            background: rgba(0, 50, 0, 0.7);
+            color: #fff;
+            transform: translateX(5px);
+        }
+        .loading-text {
+            color: #0f0;
+            font-size: 20px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
+    
+    <cite class="home-title" style="position: absolute; top:20px; left:20px;">
+        FILE CENTER
+    </cite>
+    
+    <div id="file-container" class="file-container" 
+         style="position: absolute; top:100px; left:80px;">
+        <p class="loading-text">Loading file list...</p>
+    </div>
+    
+    <a class="goto-link-botton" href="index.html" 
+       style="position: absolute; top:20px; left:1350px;"
+    >Home</a>
+    
+    <!-- 页脚信息保持不变 -->
+    <p id="page-tail" class="page-tail" style="position: absolute; top:680px; left:1150px;">Developed by</p>
+    <a id="page-tail" class="page-tail" href="https://zzjjack.us.kg" 
+       style="position: absolute; top:695px; left:1255px;">ZZJ</a>
+    <p id="page-tail2" class="page-tail" style="position: absolute; top:680px; left:1285px;">and Coding Team</p>
+    <p id="page-tail3" class="page-tail" style="position: absolute; top:700px; left:1310px;">2025, Coding</p>
+    
+    <script>
+    /**
+     * 文件加载功能
+     * 实现原理：从同级目录下的files/files.txt加载文件列表
+     */
+    function loadFileList() {
+        const container = document.getElementById('file-container');
+        
+        fetch('./files/files.txt')
+            .then(response => {
+                if (!response.ok) throw new Error('File not found');
+                return response.text();
+            })
+            
+            .then(data => {
+                container.innerHTML = '';
+                
+                // 解析文件内容
+                const lines = data.trim().split('\n');
+                
+                // 添加标题
+                const title = document.createElement('h2');
+                title.textContent = `Available Files (${lines.length})`;
+                title.style.color = '#0f0';
+                title.style.marginBottom = '20px';
+                container.appendChild(title);
+                
+                // 遍历所有文件
+                lines.forEach(line => {
+                    if (!line.trim()) return;
+                    
+                    // 按第一个冒号分割（防止URL中有多余冒号）
+                    const colonIndex = line.indexOf(':');
+                    if (colonIndex === -1) return;
+                    
+                    const fileName = line.substring(0, colonIndex);
+                    const fileUrl = line.substring(colonIndex + 1);
+                    
+                    // 创建文件条目
+                    const link = document.createElement('a');
+                    link.className = 'file-entry';
+                    const encodedUrl = encodeURI(fileUrl); 
+                    link.href = encodedUrl;
+                    link.target = '_blank';
+                    link.innerHTML = `› ${fileName}`;
+                    
+                    container.appendChild(link);
+                });
+            })
+            .catch(error => {
+                console.error('加载错误:', error);
+                container.innerHTML = `<p style="color:#f00">Error: File list not found (${error.message})</p>`;
+            });
+    }
+
+    /**
+     * 初始化数字矩阵雨特效
+     * 实现原理：Canvas动画 + 随机字符生成
+     */
+    function createMatrixEffect() {
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 初始化画布尺寸（覆盖整个视口）
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // 字符配置
+        const config = {
+            fontSize: 15,
+            fontFamily: 'MS Gothic',
+            charSet:"abcdefghijklmnopqrstuvwxyz",
+            textColor: '#0F0'
+        };
+
+        // 计算列数（基于画布宽度和字体大小）
+        const columnCount = Math.floor(canvas.width / config.fontSize);
+        
+        // 初始化每列的Y轴起始位置
+        const verticalPositions = new Array(columnCount).fill(0);
+
+        function drawFrame() {
+            // 添加残影效果
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = config.textColor;
+            ctx.font = `${config.fontSize}px ${config.fontFamily}`;
+
+            // 逐列绘制字符
+            verticalPositions.forEach((yPos, index) => {
+                const randomChar = config.charSet[
+                    Math.floor(Math.random() * config.charSet.length)
+                ];
+                
+                const x = index * config.fontSize;
+                const y = yPos * config.fontSize;
+
+                ctx.fillText(randomChar, x, y);
+
+                if (y > canvas.height && Math.random() > 0.975) {
+                    verticalPositions[index] = 0;
+                }
+                
+                verticalPositions[index] ++;
+            });
+
+            requestAnimationFrame(drawFrame);
+        }
+
+        // 窗口尺寸变化监听
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        drawFrame();
+    }
+
+    // 页面加载后启动特效和文件加载
+    window.addEventListener('load', () => {
+        createMatrixEffect();
+        loadFileList();
+        
+        // 每30秒刷新一次文件列表
+        setInterval(loadFileList, 30000);
+    });
+    </script>
+</body>
+</html>
