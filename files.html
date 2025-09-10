@@ -10,119 +10,152 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <!-- 强制IE浏览器使用最新渲染引擎 -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Coding</title>
+    <title>Coding 文件中心</title>
+    <!-- 引入样式表 -->
     <link rel="stylesheet" href="./css/all.settings.css">
     <link rel="stylesheet" href="./css/file.settings.css">
     <style>
+        /* 文件容器样式 - 深绿色科技主题 */
         .file-container {
             background-color: rgba(0, 20, 0, 0.6); /* 半透明深绿色背景 */
             padding: 20px;
             border-radius: 8px;
-            border: 1px solid #0f0;
+            border: 1px solid #0f0; /* 亮绿色边框 */
             max-height: 600px;
             overflow-y: auto;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3); /* 绿色发光效果 */
         }
+        
+        /* 文件条目样式 */
         .file-entry {
             display: block;
             padding: 12px;
             margin-bottom: 8px;
-            color: #0f0;
+            color: #0f0; /* 亮绿色文本 */
             font-size: 18px;
             font-weight: bold;
             text-decoration: none;
-            border-left: 3px solid #0f0;
-            transition: all 0.3s;
+            border-left: 3px solid #0f0; /* 左侧指示条 */
+            transition: all 0.3s; /* 平滑过渡效果 */
         }
+        
+        /* 文件条目悬停效果 */
         .file-entry:hover {
-            background: rgba(0, 50, 0, 0.7);
-            color: #fff;
-            transform: translateX(5px);
+            background: rgba(0, 50, 0, 0.7); /* 悬停时加深背景 */
+            color: #fff; /* 悬停时变为白色文字 */
+            transform: translateX(5px); /* 轻微右移效果 */
         }
+        
+        /* 加载文本样式 */
         .loading-text {
             color: #0f0;
             font-size: 20px;
             padding: 20px;
         }
+        
+        /* 文件标题样式 */
+        .file-title {
+            color: #0f0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 255, 0, 0.3); /* 下划线效果 */
+            padding-bottom: 10px;
+        }
     </style>
 </head>
 <body>
+    <!-- 矩阵效果画布 -->
     <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
     
+    <!-- 页面标题 -->
     <cite class="home-title" style="position: absolute; top:20px; left:20px;">
         FILE CENTER
     </cite>
     
+    <!-- 文件列表容器 -->
     <div id="file-container" class="file-container" 
          style="position: absolute; top:100px; left:80px;">
-        <p class="loading-text">Loading file list...</p>
+        <p class="loading-text">正在加载文件列表...</p>
     </div>
     
+    <!-- 返回首页链接 -->
     <a class="goto-link-botton" href="index.html" 
        style="position: absolute; top:20px; left:1350px;"
-    >Home</a>
+    >首页</a>
     
-    <!-- 页脚信息保持不变 -->
-    <p id="page-tail" class="page-tail" style="position: absolute; top:680px; left:1150px;">Developed by</p>
+    <!-- 页脚信息 -->
+    <p id="page-tail" class="page-tail" style="position: absolute; top:680px; left:1150px;">开发团队</p>
     <a id="page-tail" class="page-tail" href="https://zzjjack.us.kg" 
        style="position: absolute; top:695px; left:1255px;">ZZJ</a>
-    <p id="page-tail2" class="page-tail" style="position: absolute; top:680px; left:1285px;">and Coding Team</p>
+    <p id="page-tail2" class="page-tail" style="position: absolute; top:680px; left:1285px;">及编程团队</p>
     <p id="page-tail3" class="page-tail" style="position: absolute; top:700px; left:1310px;">2025, Coding</p>
     
     <script>
     /**
      * 文件加载功能
      * 实现原理：从同级目录下的files/files.txt加载文件列表
+     * 修复问题：Windows换行符(\r)导致URL末尾出现%0D
      */
     function loadFileList() {
         const container = document.getElementById('file-container');
         
+        // 使用fetch API获取文件列表
         fetch('./files/files.txt')
             .then(response => {
-                if (!response.ok) throw new Error('File not found');
+                // 检查响应是否成功
+                if (!response.ok) throw new Error('文件未找到');
                 return response.text();
             })
-            
             .then(data => {
+                // 清空容器内容
                 container.innerHTML = '';
-                .then(data => {
                 
-                // 新增：统一替换所有\r字符
+                // --- 关键修复：处理Windows换行符问题 ---
+                // 删除所有回车符(\r)，解决URL末尾出现%0D的问题
                 const cleanedData = data.replace(/\r/g, '');
+                
+                // 分割为行并移除空行
                 const lines = cleanedData.trim().split('\n');
                 
-                // 添加标题
+                // 添加标题显示文件数量
                 const title = document.createElement('h2');
+                title.className = 'file-title';
                 title.textContent = `游戏文件 (${lines.length})`;
-                title.style.color = '#0f0';
-                title.style.marginBottom = '20px';
                 container.appendChild(title);
                 
-                // 遍历所有文件
+                // 遍历所有文件行
                 lines.forEach(line => {
+                    // 跳过空行
                     if (!line.trim()) return;
                     
                     // 按第一个冒号分割（防止URL中有多余冒号）
                     const colonIndex = line.indexOf(':');
-                    if (colonIndex === -1) return;
+                    if (colonIndex === -1) return; // 跳过格式错误的行
                     
+                    // 解析文件名和URL
                     const fileName = line.substring(0, colonIndex);
-                    const fileUrl = line.substring(colonIndex + 1);
+                    let fileUrl = line.substring(colonIndex + 1);
                     
-                    // 创建文件条目
+                    // 再次确保URL没有换行符
+                    fileUrl = fileUrl.trim();
+                    
+                    // 创建文件条目链接
                     const link = document.createElement('a');
                     link.className = 'file-entry';
+                    
+                    // 使用encodeURI安全编码URL
                     const encodedUrl = encodeURI(fileUrl); 
                     link.href = encodedUrl;
                     link.target = '_blank';
                     link.innerHTML = `› ${fileName}`;
                     
+                    // 添加到容器
                     container.appendChild(link);
                 });
             })
             .catch(error => {
+                // 错误处理
                 console.error('加载错误:', error);
-                container.innerHTML = `<p style="color:#f00">Error: File list not found (${error.message})</p>`;
+                container.innerHTML = `<p style="color:#f00">错误: 文件列表未找到 (${error.message})</p>`;
             });
     }
 
@@ -138,64 +171,81 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // 字符配置
+        // 字符动画配置
         const config = {
-            fontSize: 15,
-            fontFamily: 'MS Gothic',
-            charSet:"abcdefghijklmnopqrstuvwxyz",
-            textColor: '#0F0'
+            fontSize: 15,                   // 字符大小
+            fontFamily: 'MS Gothic',         // 字体选择（等宽字体）
+            charSet: "abcdefghijklmnopqrstuvwxyz", // 字符集
+            textColor: '#0F0'                // 字符颜色（绿色主题）
         };
 
         // 计算列数（基于画布宽度和字体大小）
         const columnCount = Math.floor(canvas.width / config.fontSize);
         
-        // 初始化每列的Y轴起始位置
+        // 初始化每列的Y轴起始位置（瀑布流起点）
         const verticalPositions = new Array(columnCount).fill(0);
 
+        /**
+         * 绘制每一帧的动画
+         */
         function drawFrame() {
-            // 添加残影效果
+            // 添加残影效果（透明黑色覆盖）
             ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
+            // 设置文本样式
             ctx.fillStyle = config.textColor;
             ctx.font = `${config.fontSize}px ${config.fontFamily}`;
 
-            // 逐列绘制字符
+            // 逐列绘制字符（瀑布流效果）
             verticalPositions.forEach((yPos, index) => {
+                // 随机选择字符
                 const randomChar = config.charSet[
                     Math.floor(Math.random() * config.charSet.length)
                 ];
                 
+                // 计算当前字符位置
                 const x = index * config.fontSize;
                 const y = yPos * config.fontSize;
 
+                // 绘制字符
                 ctx.fillText(randomChar, x, y);
 
+                // 如果字符超出屏幕底部且满足随机条件，重置到顶部
                 if (y > canvas.height && Math.random() > 0.975) {
                     verticalPositions[index] = 0;
                 }
                 
-                verticalPositions[index] ++;
+                // 该列位置下移
+                verticalPositions[index]++;
             });
 
+            // 请求下一帧动画
             requestAnimationFrame(drawFrame);
         }
 
         // 窗口尺寸变化监听
         window.addEventListener('resize', () => {
+            // 调整画布尺寸适应窗口变化
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
 
+        // 启动动画
         drawFrame();
     }
 
-    // 页面加载后启动特效和文件加载
+    /**
+     * 页面加载后初始化
+     */
     window.addEventListener('load', () => {
+        // 启动矩阵动画效果
         createMatrixEffect();
+        
+        // 加载文件列表
         loadFileList();
         
-        // 每30秒刷新一次文件列表
+        // 每30秒刷新一次文件列表（可选）
         setInterval(loadFileList, 30000);
     });
     </script>
