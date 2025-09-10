@@ -85,9 +85,11 @@
             
             .then(data => {
                 container.innerHTML = '';
+                .then(data => {
                 
-                // 解析文件内容
-                const lines = data.trim().split('\n');
+                // 新增：统一替换所有\r字符
+                const cleanedData = data.replace(/\r/g, '');
+                const lines = cleanedData.trim().split('\n');
                 
                 // 添加标题
                 const title = document.createElement('h2');
