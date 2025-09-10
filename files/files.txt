@@ -1,2 +1,2 @@
-Pvz-2.4.6:https://gitcode.com/ZZJ-JACK/Pvz/releases/download/V2.4.6/Pvz-V2.4.6.7z
+Pvz-2.4.6(植物大战僵尸):https://gitcode.com/ZZJ-JACK/Pvz/releases/download/V2.4.6/Pvz-V2.4.6.7z
 五子棋:https://gitcode.com/ZZJ-JACK/Drive/releases/download/五子棋-V1.0/五子棋.7z
