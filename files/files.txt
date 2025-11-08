@@ -1,2 +1,3 @@
 Pvz-2.4.6(植物大战僵尸):https://gitcode.com/ZZJ-JACK/Pvz/releases/download/V2.4.6/Pvz-2.4.6-Setup.exe
 五子棋:https://gitcode.com/ZZJ-JACK/Drive/releases/download/五子棋-V1.0/五子棋.7z
+网络联机客户端:https://gitcode.com/ZZJ-JACK/Drive/releases/download/工具/client.exe
