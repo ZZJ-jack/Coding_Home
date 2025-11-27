@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>纯前端在线C++编译器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #0a0e17;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(46, 213, 115, 0.3);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #2ed573;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2ed573, #1e90ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(46, 213, 115, 0.5);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-button {
+            position: relative;
+            padding: 12px 24px;
+            background: rgba(30, 144, 255, 0.1);
+            border: 1px solid rgba(30, 144, 255, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(30, 144, 255, 0.4), transparent);
+            transition: left 0.5s;
+            z-index: -1;
+        }
+        
+        .nav-button:hover::before {
+            left: 100%;
+        }
+        
+        .nav-button:hover {
+            background: rgba(30, 144, 255, 0.2);
+            border-color: rgba(30, 144, 255, 0.6);
+            box-shadow: 0 0 15px rgba(30, 144, 255, 0.4);
+            transform: translateY(-3px);
+        }
+        
+        .nav-button i {
+            margin-right: 8px;
+        }
+        
+        .welcome-section {
+            text-align: center;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+        }
+        
+        .welcome-container {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #2ed573, #1e90ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(46, 213, 115, 0.3);
+            display: inline-block;
+        }
+        
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 2.5rem;
+            background-color: #2ed573;
+            margin-left: 5px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+        
+        .compiler-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 1024px) {
+            .compiler-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: rgba(20, 25, 40, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(46, 213, 115, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(46, 213, 115, 0.5);
+        }
+        
+        .panel-header {
+            background: rgba(30, 40, 60, 0.8);
+            color: #e0e0e0;
+            padding: 15px 20px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(46, 213, 115, 0.2);
+        }
+        
+        .panel-body {
+            padding: 0;
+            height: 450px;
+        }
+        
+        #editor {
+            height: 100%;
+            width: 100%;
+        }
+        
+        #output {
+            height: 100%;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            background: #1a1f2e;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            position: relative;
+            padding: 14px 28px;
+            background: rgba(30, 144, 255, 0.1);
+            border: 1px solid rgba(30, 144, 255, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(30, 144, 255, 0.4), transparent);
+            transition: left 0.5s;
+            z-index: -1;
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:hover {
+            background: rgba(30, 144, 255, 0.2);
+            border-color: rgba(30, 144, 255, 0.6);
+            box-shadow: 0 0 15px rgba(30, 144, 255, 0.4);
+            transform: translateY(-3px);
+        }
+        
+        button.run {
+            background: rgba(39, 174, 96, 0.1);
+            border-color: rgba(39, 174, 96, 0.3);
+        }
+        
+        button.run:hover {
+            background: rgba(39, 174, 96, 0.2);
+            border-color: rgba(39, 174, 96, 0.6);
+            box-shadow: 0 0 15px rgba(39, 174, 96, 0.4);
+        }
+        
+        button.clear {
+            background: rgba(231, 76, 60, 0.1);
+            border-color: rgba(231, 76, 60, 0.3);
+        }
+        
+        button.clear:hover {
+            background: rgba(231, 76, 60, 0.2);
+            border-color: rgba(231, 76, 60, 0.6);
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.4);
+        }
+        
+        .input-section {
+            margin-bottom: 25px;
+        }
+        
+        .input-section textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            background: rgba(20, 25, 40, 0.6);
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+        
+        .input-section textarea:focus {
+            outline: none;
+            border-color: rgba(46, 213, 115, 0.6);
+            box-shadow: 0 0 10px rgba(46, 213, 115, 0.3);
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: bold;
+            background: rgba(30, 40, 60, 0.6);
+            border: 1px solid rgba(46, 213, 115, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .spinner {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid #3498db;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(20, 25, 40, 0.6);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(46, 213, 115, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(46, 213, 115, 0.5);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #2ed573;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #e0e0e0;
+        }
+        
+        .feature-desc {
+            color: #a0a0a0;
+            line-height: 1.6;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(46, 213, 115, 0.3);
+            margin-top: 60px;
+        }
+        
+        .footer-text {
+            color: #a0a0a0;
+            margin-bottom: 10px;
+        }
+        
+        .footer-link {
+            color: #2ed573;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: #1e90ff;
+            text-decoration: underline;
+        }
+        
+        .team-name {
+            font-weight: 600;
+            color: #2ed573;
+        }
+        
+        select {
+            padding: 12px 20px;
+            background: rgba(30, 40, 60, 0.6);
+            border: 1px solid rgba(46, 213, 115, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        select:hover {
+            border-color: rgba(46, 213, 115, 0.6);
+            box-shadow: 0 0 10px rgba(46, 213, 115, 0.3);
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: rgba(46, 213, 115, 0.6);
+            box-shadow: 0 0 10px rgba(46, 213, 115, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .welcome-text {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+    <!-- Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.js"></script>
+</head>
+<body>
+    <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-code logo-icon"></i>
+                <div class="logo-text">C++ Compiler</div>
+            </div>
+            
+            <div class="nav-buttons">
+                <a href="#" class="nav-button">
+                    <i class="fas fa-folder"></i> 文件
+                </a>
+                <a href="#" class="nav-button">
+                    <i class="fas fa-info-circle"></i> 关于
+                </a>
+            </div>
+        </header>
+        
+        <section class="welcome-section">
+            <div class="welcome-container">
+                <span id="welcome-text" class="welcome-text"></span>
+                <span class="typing-cursor"></span>
+            </div>
+            <p class="subtitle">纯前端在线C++编译器 - 在浏览器中编写、编译和运行C++代码，无需服务器支持</p>
+        </section>
+        
+        <div class="status" id="status">
+            准备就绪 - 输入您的C++代码并点击"运行"按钮
+        </div>
+        
+        <div class="controls">
+            <button class="run" id="runBtn">
+                <i class="fas fa-play"></i>
+                运行代码
+            </button>
+            <button class="clear" id="clearBtn">
+                <i class="fas fa-trash"></i>
+                清除输出
+            </button>
+            <select id="exampleSelector">
+                <option value="">选择示例代码...</option>
+                <option value="0">Hello World</option>
+                <option value="1">基本计算器</option>
+                <option value="2">阶乘计算</option>
+                <option value="3">向量操作</option>
+            </select>
+        </div>
+        
+        <div class="compiler-container">
+            <div class="panel">
+                <div class="panel-header">
+                    <span><i class="fas fa-code"></i> 代码编辑器</span>
+                    <span>C++</span>
+                </div>
+                <div class="panel-body">
+                    <div id="editor"></div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <span><i class="fas fa-terminal"></i> 输出结果</span>
+                    <span>控制台</span>
+                </div>
+                <div class="panel-body">
+                    <pre id="output"></pre>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-section">
+            <div class="panel">
+                <div class="panel-header">
+                    <span><i class="fas fa-keyboard"></i> 标准输入</span>
+                    <span>stdin</span>
+                </div>
+                <textarea id="stdin" placeholder="在此输入程序的标准输入内容...">10 20</textarea>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在编译和运行代码，请稍候...</p>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-laptop-code feature-icon"></i>
+                <h3 class="feature-title">纯前端实现</h3>
+                <p class="feature-desc">使用WebAssembly技术，无需服务器支持，完全在浏览器中运行</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-bolt feature-icon"></i>
+                <h3 class="feature-title">即时编译</h3>
+                <p class="feature-desc">快速编译C++代码并查看结果，支持标准输入输出</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-code feature-icon"></i>
+                <h3 class="feature-title">代码高亮</h3>
+                <p class="feature-desc">基于Monaco Editor提供专业的代码编辑体验</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-shield-alt feature-icon"></i>
+                <h3 class="feature-title">安全运行</h3>
+                <p class="feature-desc">代码在安全的沙箱环境中执行，不会影响您的设备</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p class="footer-text">Developed by <a href="https://zzjjack.us.kg" class="footer-link">ZZJ</a> and <span class="team-name">Coding Team</span></p>
+            <p class="footer-text">2025, C++ Compiler</p>
+        </footer>
+    </div>
+
+    <script>
+        // 打字机效果
+        const welcomeTexts = [
+            "纯前端在线C++编译器",
+            "在浏览器中编译和运行C++代码",
+            "无需服务器支持，安全快速"
+        ];
+        
+        let currentTextIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typingSpeed = 150;
+        const deletingSpeed = 100;
+        const pauseTime = 1500;
+        
+        function typeWriter() {
+            const welcomeElement = document.getElementById("welcome-text");
+            const currentText = welcomeTexts[currentTextIndex];
+            
+            if (isDeleting) {
+                // 删除模式
+                welcomeElement.textContent = currentText.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                // 打字模式
+                welcomeElement.textContent = currentText.substring(0, charIndex + 1);
+                charIndex++;
+            }
+            
+            // 确定速度
+            let typeDelay = isDeleting ? deletingSpeed : typingSpeed;
+            
+            // 如果完成打字
+            if (!isDeleting && charIndex === currentText.length) {
+                typeDelay = pauseTime;
+                isDeleting = true;
+            } 
+            // 如果完成删除
+            else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                currentTextIndex = (currentTextIndex + 1) % welcomeTexts.length;
+                typeDelay = 500;
+            }
+            
+            setTimeout(typeWriter, typeDelay);
+        }
+        
+        // 页面加载后启动打字效果
+        window.addEventListener('load', typeWriter);
+        
+        // 矩阵雨特效
+        function createMatrixEffect() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const config = {
+                fontSize: 16,
+                fontFamily: 'monospace',
+                charSet: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~",
+                textColor: '#1e90ff'
+            };
+
+            const columnCount = Math.floor(canvas.width / config.fontSize);
+            const verticalPositions = new Array(columnCount).fill(0);
+
+            function drawFrame() {
+                ctx.fillStyle = 'rgba(10, 14, 23, 0.06)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = config.textColor;
+                ctx.font = `${config.fontSize}px ${config.fontFamily}`;
+
+                verticalPositions.forEach((yPos, index) => {
+                    const randomChar = config.charSet[
+                        Math.floor(Math.random() * config.charSet.length)
+                    ];
+                    
+                    const x = index * config.fontSize;
+                    const y = yPos * config.fontSize;
+
+                    ctx.fillText(randomChar, x, y);
+
+                    if (y > canvas.height && Math.random() > 0.975) {
+                        verticalPositions[index] = 0;
+                    }
+                    
+                    verticalPositions[index]++;
+                });
+
+                requestAnimationFrame(drawFrame);
+            }
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+
+            drawFrame();
+        }
+
+        // 页面加载后启动矩阵雨特效
+        window.addEventListener('load', createMatrixEffect);
+        
+        // 初始化Monaco Editor
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' }});
+        
+        require(['vs/editor/editor.main'], function() {
+            // 创建编辑器
+            const editor = monaco.editor.create(document.getElementById('editor'), {
+                value: `#include <iostream>\nusing namespace std;\n\nint main() {\n    int a, b;\n    cin >> a >> b;\n    cout << "结果: " << a + b << endl;\n    return 0;\n}`,
+                language: 'cpp',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                fontSize: 14,
+                minimap: {
+                    enabled: false
+                }
+            });
+            
+            // 获取DOM元素
+            const runBtn = document.getElementById('runBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const outputElement = document.getElementById('output');
+            const stdinElement = document.getElementById('stdin');
+            const statusElement = document.getElementById('status');
+            const loadingElement = document.getElementById('loading');
+            const exampleSelector = document.getElementById('exampleSelector');
+            
+            // 示例代码列表
+            const examples = [
+                `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello, World!" << endl;\n    return 0;\n}`,
+                `#include <iostream>\nusing namespace std;\n\nint main() {\n    int a, b;\n    cin >> a >> b;\n    cout << "和: " << a + b << endl;\n    cout << "差: " << a - b << endl;\n    cout << "积: " << a * b << endl;\n    if (b != 0) {\n        cout << "商: " << a / b << endl;\n    }\n    return 0;\n}`,
+                `#include <iostream>\nusing namespace std;\n\nint factorial(int n) {\n    if (n <= 1) return 1;\n    return n * factorial(n - 1);\n}\n\nint main() {\n    int n;\n    cin >> n;\n    cout << n << "! = " << factorial(n) << endl;\n    return 0;\n}`,
+                `#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> nums = {1, 2, 3, 4, 5};\n    int sum = 0;\n    \n    for (int num : nums) {\n        sum += num;\n    }\n    \n    cout << "向量元素: ";\n    for (int num : nums) {\n        cout << num << " ";\n    }\n    cout << "\\n总和: " << sum << endl;\n    \n    return 0;\n}`
+            ];
+            
+            // 示例代码选择器事件
+            exampleSelector.addEventListener('change', function() {
+                const index = parseInt(this.value);
+                if (!isNaN(index) && index >= 0 && index < examples.length) {
+                    editor.setValue(examples[index]);
+                    statusElement.textContent = `已加载示例代码: ${exampleSelector.options[exampleSelector.selectedIndex].text}`;
+                }
+            });
+            
+            // 运行按钮点击事件
+            runBtn.addEventListener('click', function() {
+                runCode();
+            });
+            
+            // 清除按钮点击事件
+            clearBtn.addEventListener('click', function() {
+                outputElement.textContent = '';
+                statusElement.textContent = '输出已清除';
+            });
+            
+            // 模拟编译和运行C++代码
+            function runCode() {
+                const code = editor.getValue();
+                const stdin = stdinElement.value;
+                
+                if (!code.trim()) {
+                    statusElement.textContent = '错误: 请输入C++代码';
+                    return;
+                }
+                
+                // 显示加载状态
+                loadingElement.style.display = 'block';
+                statusElement.textContent = '正在编译和运行代码...';
+                outputElement.textContent = '';
+                
+                // 模拟编译过程
+                setTimeout(() => {
+                    // 模拟编译错误
+                    if (code.includes('error')) {
+                        outputElement.textContent = '编译错误: 代码中包含"error"关键字\n请修改代码后重试';
+                        statusElement.textContent = '编译失败';
+                        loadingElement.style.display = 'none';
+                        return;
+                    }
+                    
+                    // 模拟运行结果
+                    let output = '';
+                    
+                    // 处理标准输入
+                    const inputLines = stdin.split('\n');
+                    let inputIndex = 0;
+                    
+                    // 模拟程序输出
+                    if (code.includes('Hello, World')) {
+                        output = 'Hello, World!\n';
+                    } else if (code.includes('a + b')) {
+                        const inputs = inputLines[0].split(' ').map(Number);
+                        if (inputs.length >= 2) {
+                            output = `结果: ${inputs[0] + inputs[1]}\n`;
+                        } else {
+                            output = '错误: 请输入两个数字\n';
+                        }
+                    } else if (code.includes('factorial')) {
+                        const n = parseInt(inputLines[0]);
+                        if (!isNaN(n)) {
+                            let fact = 1;
+                            for (let i = 2; i <= n; i++) {
+                                fact *= i;
+                            }
+                            output = `${n}! = ${fact}\n`;
+                        } else {
+                            output = '错误: 请输入一个有效的数字\n';
+                        }
+                    } else if (code.includes('vector')) {
+                        output = '向量元素: 1 2 3 4 5 \n总和: 15\n';
+                    } else {
+                        output = '程序运行完成\n';
+                    }
+                    
+                    outputElement.textContent = output;
+                    statusElement.textContent = '程序运行成功';
+                    loadingElement.style.display = 'none';
+                }, 1500);
+            }
+            
+            // 添加键盘快捷键
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    runCode();
+                }
+            });
+            
+            // 状态消息
+            statusElement.textContent = '编辑器已加载完成，可以开始编写代码';
+        });
+    </script>
+</body>
+</html>
