@@ -1,140 +1,479 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coding 关于</title>
-    <link rel="stylesheet" href="./css/all.settings.css">
-    <link rel="stylesheet" href="./css/about.settings.css">
-    <!-- 标准网站图标声明 -->
-    <link rel="icon" href="img/ico/site-ico.png" type="image/x-icon"> 
-    <!-- 兼容旧版浏览器 -->
-    <link rel="shortcut icon" href="img/ico/site-ico.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #0a0e17;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(46, 213, 115, 0.3);
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #2ed573;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2ed573, #1e90ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(46, 213, 115, 0.5);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-button {
+            position: relative;
+            padding: 12px 24px;
+            background: rgba(30, 144, 255, 0.1);
+            border: 1px solid rgba(30, 144, 255, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(30, 144, 255, 0.4), transparent);
+            transition: left 0.5s;
+            z-index: -1;
+        }
+        
+        .nav-button:hover::before {
+            left: 100%;
+        }
+        
+        .nav-button:hover {
+            background: rgba(30, 144, 255, 0.2);
+            border-color: rgba(30, 144, 255, 0.6);
+            box-shadow: 0 0 15px rgba(30, 144, 255, 0.4);
+            transform: translateY(-3px);
+        }
+        
+        .nav-button i {
+            margin-right: 8px;
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .about-text {
+            padding: 30px;
+            background: rgba(20, 25, 40, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(46, 213, 115, 0.2);
+            line-height: 1.8;
+        }
+        
+        .about-text h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #2ed573;
+        }
+        
+        .about-text p {
+            margin-bottom: 15px;
+            color: #a0a0a0;
+        }
+        
+        .about-text ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .about-text li {
+            margin-bottom: 10px;
+            color: #a0a0a0;
+        }
+        
+        .about-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .about-image img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+        
+        .team-section {
+            margin-bottom: 60px;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #2ed573;
+            text-align: center;
+        }
+        
+        .team-members {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .member-card {
+            background: rgba(20, 25, 40, 0.6);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(46, 213, 115, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .member-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(46, 213, 115, 0.5);
+        }
+        
+        .member-icon {
+            font-size: 3rem;
+            color: #2ed573;
+            margin-bottom: 20px;
+        }
+        
+        .member-name {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #e0e0e0;
+        }
+        
+        .member-role {
+            color: #a0a0a0;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .member-desc {
+            color: #a0a0a0;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin: 2px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(46, 213, 115, 0.3);
+            margin-top: 60px;
+        }
+        
+        .footer-text {
+            color: #a0a0a0;
+            margin-bottom: 10px;
+        }
+        
+        .footer-link {
+            color: #2ed573;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: #1e90ff;
+            text-decoration: underline;
+        }
+        
+        .team-name {
+            font-weight: 600;
+            color: #2ed573;
+        }
+        
+        @media (max-width: 768px) {
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
     <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
-    <cite class = "home-title" style = "position: absolute;
-                                        top:0px; 
-                                        left:0px;">
-    About</cite>
-    <div id="about-text" class="about-text-body-page" style = "position: absolute;
-                                                                top:0px; 
-                                                                left:80px;">
-    </div>
-    <a class = "goto-link-botton" href="index.html" style = "position: absolute;
-                                                            top:10px; 
-                                                            left:1350px;"
-    >Home</a>
-    <img src="https://cdn.luogu.com.cn/upload/image_hosting/kdlygl6g.png" alt="LOGO" width=500" style = "
-                                                                                                        position: absolute;
-                                                                                                        top: 80px;
-                                                                                                        left: 850px;
-                                                                                                        "/>
-    <p id = "page-tail" class = "page-tail" style = "position: absolute;
-                                                        top:680px; 
-                                                        left:1150px;"
-    >Developed by</p>
-    <a  id = "page-tail" class = "page-tail" href = "https://zzjjack.us.kg" style = "position: absolute;
-                                                    top:695px; 
-                                                    left:1255px;"
-    >ZZJ</a>
-    <p id = "page-tail2" class = "page-tail" style = "position: absolute;
-                                                    top:680px; 
-                                                    left:1285px;"
-    >and Coding Team</p>
-    <p id = "page-tail3" class = "page-tail" style = "position: absolute;
-                                                    top:700px; 
-                                                    left:1310px;"
-    >2025, Coding</p>
-    <script>
-        about_text = "「代码即画笔，算法为诗行」\n我们是一支来自中山一中的年轻编程团队，\n由热爱技术的开发者、算法探索者和创意极客组成。\n\n我们专注以下领域：\n1、为校内社团活动提供技术支持（如3D建模、微信小程序开发）\n2、在GitHub维护校园代码库，共享教务系统优化方案\n\n加入我们：从零开始构建项目，用代码书写属于你的成长故事！";
-        about_speed = 150; // 打字速度，单位毫秒
-        about_index = 0;
-        function about_typeWriter() {
-            if (about_index < about_text.length) {
-                document.getElementById("about-text").innerHTML += about_text.charAt(about_index);
-                about_index++;
-                setTimeout(about_typeWriter, about_speed);
-            }
-        }
-        about_typeWriter();
-    </script>
-    <script>
-    /**
-     * 初始化数字矩阵雨特效
-     * 实现原理：Canvas动画 + 随机字符生成
-     */
-    function createMatrixEffect() {
-        const canvas = document.getElementById('matrixCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // 初始化画布尺寸（覆盖整个视口）
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        // 字符配置
-        const config = {
-            fontSize: 15,               // 字符像素大小
-            fontFamily: 'MS Gothic',    // 等宽终端字体
-            charSet:"abcdefghijklmnopqrstuvwxyz", // 混合字符集
-            textColor: '#0F0'           // 经典绿色
-        };
-
-        // 计算列数（基于画布宽度和字体大小）
-        const columnCount = Math.floor(canvas.width / config.fontSize);
-        
-        // 初始化每列的Y轴起始位置
-        const verticalPositions = new Array(columnCount).fill(0);
-
-        /**
-         * 生成动画帧
-         */
-        function drawFrame() {
-            // 添加残影效果（透明度越低，拖影越短）
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-code logo-icon"></i>
+                <div class="logo-text">Coding</div>
+            </div>
             
-            // 设置字体样式
-            ctx.fillStyle = config.textColor;
-            ctx.font = `${config.fontSize}px ${config.fontFamily}`;
-
-            // 逐列绘制字符
-            verticalPositions.forEach((yPos, index) => {
-                // 生成随机字符
-                const randomChar = config.charSet[
-                    Math.floor(Math.random() * config.charSet.length)
-                ];
+            <div class="nav-buttons">
+                <a href="index.html" class="nav-button">
+                    <i class="fas fa-home"></i> 首页
+                </a>
+                <a href="files.html" class="nav-button">
+                    <i class="fas fa-folder"></i> 文件
+                </a>
+            </div>
+        </header>
+        
+        <section class="about-content">
+            <div class="about-text">
+                <h2>关于我们</h2>
+                <p>「代码即画笔，算法为诗行」</p>
+                <p>我们是一支来自中山一中的年轻编程团队，由热爱技术的开发者、算法探索者和创意极客组成。</p>
                 
-                // 计算绘制坐标
-                const x = index * config.fontSize;
-                const y = yPos * config.fontSize;
-
-                // 绘制字符
-                ctx.fillText(randomChar, x, y);
-
-                // 控制字符流重置（2.5%概率重置）
-                if (y > canvas.height && Math.random() > 0.975) {
-                    verticalPositions[index] = 0;
-                }
+                <h3>我们专注以下领域：</h3>
+                <ul>
+                    <li>为校内社团活动提供技术支持（如3D建模、微信小程序开发）</li>
+                    <li>在GitHub维护校园代码库，共享教务系统优化方案</li>
+                </ul>
                 
-                // 更新Y轴位置
-                verticalPositions[index] ++;
-            });
+                <p>加入我们：从零开始构建项目，用代码书写属于你的成长故事！</p>
+            </div>
+            
+            <div class="about-image">
+                <img src="https://cdn.luogu.com.cn/upload/image_hosting/kdlygl6g.png" alt="Coding团队LOGO">
+            </div>
+        </section>
+        
+        <section class="team-section">
+            <h2 class="section-title">团队核心成员</h2>
+            
+            <div class="team-members">
+                <div class="member-card">
+                    <i class="fas fa-user-secret member-icon"></i>
+                    <h3 class="member-name">YY</h3>
+                    <p class="member-role">
+                        <span class="role-badge">团队负责人</span>
+                        <span class="role-badge">统筹管理</span>
+                        <span class="role-badge">C++工程师</span>
+                    </p>
+                    <p class="member-desc">负责团队整体规划与项目管理，擅长C++开发与系统架构设计。</p>
+                </div>
+                
+                <div class="member-card">
+                    <i class="fas fa-code member-icon"></i>
+                    <h3 class="member-name">ZZJ</h3>
+                    <p class="member-role">
+                        <span class="role-badge">Python工程师</span>
+                        <span class="role-badge">C++工程师</span>
+                        <span class="role-badge">前端开发</span>
+                        <span class="role-badge">网站负责人</span>
+                    </p>
+                    <p class="member-desc">全栈开发工程师，负责团队网站建设与维护，精通多种编程语言。</p>
+                </div>
+                
+                <div class="member-card">
+                    <i class="fas fa-cogs member-icon"></i>
+                    <h3 class="member-name">CCX</h3>
+                    <p class="member-role">
+                        <span class="role-badge">前端工程师</span>
+                        <span class="role-badge">C++工程师</span>
+                        <span class="role-badge">网站开发组</span>
+                    </p>
+                    <p class="member-desc">前端与C++开发工程师，网站开发组成员，专注于用户界面与交互体验。</p>
+                </div>
+            </div>
+        </section>
 
-            // 请求下一帧动画
-            requestAnimationFrame(drawFrame);
-        }
+        <section class="team-section">
+            <h2 class="section-title">开发与测试团队</h2>
+            
+            <div class="team-members">
+                <div class="member-card">
+                    <i class="fas fa-bug member-icon"></i>
+                    <h3 class="member-name">HBR</h3>
+                    <p class="member-role">
+                        <span class="role-badge">C++工程师</span>
+                        <span class="role-badge">测试人员</span>
+                    </p>
+                    <p class="member-desc">C++开发与软件测试工程师，确保代码质量与系统稳定性。</p>
+                </div>
+                
+                <div class="member-card">
+                    <i class="fas fa-terminal member-icon"></i>
+                    <h3 class="member-name">LPL</h3>
+                    <p class="member-role">
+                        <span class="role-badge">C++工程师</span>
+                        <span class="role-badge">测试人员</span>
+                    </p>
+                    <p class="member-desc">专注于C++程序开发与功能测试，保证项目交付质量。</p>
+                </div>
+                
+                <div class="member-card">
+                    <i class="fas fa-laptop-code member-icon"></i>
+                    <h3 class="member-name">LJS</h3>
+                    <p class="member-role">
+                        <span class="role-badge">C++工程师</span>
+                        <span class="role-badge">测试人员</span>
+                    </p>
+                    <p class="member-desc">C++开发工程师，负责代码实现与系统测试工作。</p>
+                </div>
+                
+                <div class="member-card">
+                    <i class="fas fa-cube member-icon"></i>
+                    <h3 class="member-name">YJH</h3>
+                    <p class="member-role">
+                        <span class="role-badge">C++工程师</span>
+                        <span class="role-badge">测试人员</span>
+                    </p>
+                    <p class="member-desc">C++开发与测试工程师，专注于模块化开发与单元测试。</p>
+                </div>
+                
+                <div class="member-card">
+                    <i class="fas fa-shield-alt member-icon"></i>
+                    <h3 class="member-name">HBZ</h3>
+                    <p class="member-role">
+                        <span class="role-badge">C++工程师</span>
+                        <span class="role-badge">测试人员</span>
+                    </p>
+                    <p class="member-desc">C++开发工程师，负责代码安全性与稳定性测试。</p>
+                </div>
+                
+                <div class="member-card">
+                    <i class="fas fa-rocket member-icon"></i>
+                    <h3 class="member-name">PQX</h3>
+                    <p class="member-role">
+                        <span class="role-badge">C++工程师</span>
+                        <span class="role-badge">测试人员</span>
+                    </p>
+                    <p class="member-desc">C++开发与性能测试工程师，优化代码执行效率。</p>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p class="footer-text">Developed by <a href="https://zzjjack.us.kg" class="footer-link">ZZJ</a> and <span class="team-name">Coding Team</span></p>
+            <p class="footer-text">2025, Coding</p>
+        </footer>
+    </div>
 
-        // 窗口尺寸变化监听
-        window.addEventListener('resize', () => {
+    <script>
+        // 矩阵雨特效
+        function createMatrixEffect() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-        });
 
-        // 启动动画
-        drawFrame();
-    }
+            const config = {
+                fontSize: 16,
+                fontFamily: 'monospace',
+                charSet: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~",
+                textColor: '#1e90ff'
+            };
 
-    // 页面加载后启动特效
-    window.addEventListener('load', createMatrixEffect);
+            const columnCount = Math.floor(canvas.width / config.fontSize);
+            const verticalPositions = new Array(columnCount).fill(0);
+
+            function drawFrame() {
+                ctx.fillStyle = 'rgba(10, 14, 23, 0.06)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = config.textColor;
+                ctx.font = `${config.fontSize}px ${config.fontFamily}`;
+
+                verticalPositions.forEach((yPos, index) => {
+                    const randomChar = config.charSet[
+                        Math.floor(Math.random() * config.charSet.length)
+                    ];
+                    
+                    const x = index * config.fontSize;
+                    const y = yPos * config.fontSize;
+
+                    ctx.fillText(randomChar, x, y);
+
+                    if (y > canvas.height && Math.random() > 0.975) {
+                        verticalPositions[index] = 0;
+                    }
+                    
+                    verticalPositions[index]++;
+                });
+
+                requestAnimationFrame(drawFrame);
+            }
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+
+            drawFrame();
+        }
+
+        // 页面加载后启动矩阵雨特效
+        window.addEventListener('load', createMatrixEffect);
     </script>
 </body>
 </html>
