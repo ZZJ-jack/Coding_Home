@@ -1,264 +1,630 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <!-- 标准网站图标声明 -->
-    <link rel="icon" href="img/ico/site-ico.png" type="image/x-icon"> 
-    <!-- 兼容旧版浏览器 -->
-    <link rel="shortcut icon" href="img/ico/site-ico.png">
     <meta charset="UTF-8">
-    <!-- 兼容旧浏览器 -->
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <!-- 强制IE浏览器使用最新渲染引擎 -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coding 文件中心</title>
-    <!-- 引入样式表 -->
-    <link rel="stylesheet" href="./css/all.settings.css">
-    <link rel="stylesheet" href="./css/file.settings.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 文件容器样式 - 深绿色科技主题 */
-        .file-container {
-            background-color: rgba(0, 20, 0, 0.6); /* 半透明深绿色背景 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #0a0e17;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(46, 213, 115, 0.3);
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #2ed573;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2ed573, #1e90ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(46, 213, 115, 0.5);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-button {
+            position: relative;
+            padding: 12px 24px;
+            background: rgba(30, 144, 255, 0.1);
+            border: 1px solid rgba(30, 144, 255, 0.3);
             border-radius: 8px;
-            border: 1px solid #0f0; /* 亮绿色边框 */
-            max-height: 600px;
-            overflow-y: auto;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3); /* 绿色发光效果 */
-        }
-        
-        /* 文件条目样式 */
-        .file-entry {
-            display: block;
-            padding: 12px;
-            margin-bottom: 8px;
-            color: #0f0; /* 亮绿色文本 */
-            font-size: 18px;
-            font-weight: bold;
+            color: #e0e0e0;
             text-decoration: none;
-            border-left: 3px solid #0f0; /* 左侧指示条 */
-            transition: all 0.3s; /* 平滑过渡效果 */
+            font-weight: 600;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            z-index: 1;
         }
         
-        /* 文件条目悬停效果 */
-        .file-entry:hover {
-            background: rgba(0, 50, 0, 0.7); /* 悬停时加深背景 */
-            color: #fff; /* 悬停时变为白色文字 */
-            transform: translateX(5px); /* 轻微右移效果 */
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(30, 144, 255, 0.4), transparent);
+            transition: left 0.5s;
+            z-index: -1;
         }
         
-        /* 加载文本样式 */
-        .loading-text {
-            color: #0f0;
-            font-size: 20px;
-            padding: 20px;
+        .nav-button:hover::before {
+            left: 100%;
         }
         
-        /* 文件标题样式 */
-        .file-title {
-            color: #0f0;
+        .nav-button:hover {
+            background: rgba(30, 144, 255, 0.2);
+            border-color: rgba(30, 144, 255, 0.6);
+            box-shadow: 0 0 15px rgba(30, 144, 255, 0.4);
+            transform: translateY(-3px);
+        }
+        
+        .nav-button i {
+            margin-right: 8px;
+        }
+        
+        .files-section {
+            margin-bottom: 60px;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #2ed573;
+        }
+        
+        .file-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .category {
+            background: rgba(20, 25, 40, 0.6);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(46, 213, 115, 0.2);
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
             margin-bottom: 20px;
-            border-bottom: 2px solid rgba(0, 255, 0, 0.3); /* 下划线效果 */
-            padding-bottom: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(46, 213, 115, 0.2);
+        }
+        
+        .category-icon {
+            font-size: 1.8rem;
+            color: #2ed573;
+            margin-right: 15px;
+        }
+        
+        .category-title {
+            font-size: 1.5rem;
+            color: #e0e0e0;
+        }
+        
+        .file-count {
+            margin-left: auto;
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(30, 35, 50, 0.5);
+            border-radius: 8px;
+            border: 1px solid rgba(46, 213, 115, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #e0e0e0;
+        }
+        
+        .file-item:hover {
+            background: rgba(30, 144, 255, 0.2);
+            border-color: rgba(30, 144, 255, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .file-icon {
+            font-size: 1.5rem;
+            color: #2ed573;
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .file-desc {
+            font-size: 0.9rem;
+            color: #a0a0a0;
+        }
+        
+        .download-btn {
+            padding: 8px 15px;
+            background: rgba(46, 213, 115, 0.2);
+            border: 1px solid rgba(46, 213, 115, 0.4);
+            border-radius: 6px;
+            color: #2ed573;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .download-btn:hover {
+            background: rgba(46, 213, 115, 0.3);
+            box-shadow: 0 0 10px rgba(46, 213, 115, 0.4);
+        }
+        
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 0;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(46, 213, 115, 0.2);
+            border-top: 5px solid #2ed573;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-text {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+        }
+        
+        .error-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 0;
+            flex-direction: column;
+            gap: 20px;
+            color: #ff6b6b;
+        }
+        
+        .error-icon {
+            font-size: 3rem;
+            color: #ff6b6b;
+        }
+        
+        .retry-btn {
+            padding: 10px 20px;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.4);
+            border-radius: 6px;
+            color: #ff6b6b;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .retry-btn:hover {
+            background: rgba(255, 107, 107, 0.3);
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.4);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(46, 213, 115, 0.3);
+            margin-top: 60px;
+        }
+        
+        .footer-text {
+            color: #a0a0a0;
+            margin-bottom: 10px;
+        }
+        
+        .footer-link {
+            color: #2ed573;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: #1e90ff;
+            text-decoration: underline;
+        }
+        
+        .team-name {
+            font-weight: 600;
+            color: #2ed573;
+        }
+        
+        @media (max-width: 768px) {
+            .file-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 矩阵效果画布 -->
     <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
     
-    <!-- 页面标题 -->
-    <cite class="home-title" style="position: absolute; top:0px; left:0px;">
-        Files Center
-    </cite>
-    
-    <!-- 文件列表容器 -->
-    <div id="file-container" class="file-container" 
-         style="position: absolute; top:100px; left:80px;">
-        <p class="loading-text">loading...</p>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-code logo-icon"></i>
+                <div class="logo-text">Coding</div>
+            </div>
+            
+            <div class="nav-buttons">
+                <a href="index.html" class="nav-button">
+                    <i class="fas fa-home"></i> 首页
+                </a>
+                <a href="about.html" class="nav-button">
+                    <i class="fas fa-info-circle"></i> 关于
+                </a>
+            </div>
+        </header>
+        
+        <section class="files-section">
+            <h2 class="section-title">文件中心</h2>
+            
+            <div id="file-categories" class="file-categories">
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">正在加载文件列表...</div>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p class="footer-text">Developed by <a href="https://zzjjack.us.kg" class="footer-link">ZZJ</a> and <span class="team-name">Coding Team</span></p>
+            <p class="footer-text">2025, Coding</p>
+        </footer>
     </div>
-    
-    <!-- 返回首页链接 -->
-    <a class="goto-link-botton" href="index.html" 
-       style="position: absolute; top:20px; left:1350px;"
-    >Home</a>
-    
-    <!-- 页脚信息 -->
-    <p id = "page-tail" class = "page-tail" style = "position: absolute;
-                                                        top:680px; 
-                                                        left:1150px;"
-    >Developed by</p>
-    <a  id = "page-tail" class = "page-tail" href = "https://zzjjack.us.kg" style = "position: absolute;
-                                                    top:695px; 
-                                                    left:1255px;"
-    >ZZJ</a>
-    <p id = "page-tail2" class = "page-tail" style = "position: absolute;
-                                                    top:680px; 
-                                                    left:1285px;"
-    >and Coding Team</p>
-    <p id = "page-tail3" class = "page-tail" style = "position: absolute;
-                                                    top:700px; 
-                                                    left:1310px;"
-    >2025, Coding</p>
-    
+
     <script>
-    /**
-     * 文件加载功能
-     * 实现原理：从同级目录下的files/files.txt加载文件列表
-     * 修复问题：Windows换行符(\r)导致URL末尾出现%0D
-     */
-    function loadFileList() {
-        const container = document.getElementById('file-container');
-        
-        // 使用fetch API获取文件列表
-        fetch('./files/files.txt')
-            .then(response => {
-                // 检查响应是否成功
-                if (!response.ok) throw new Error('文件未找到');
-                return response.text();
-            })
-            .then(data => {
-                // 清空容器内容
-                container.innerHTML = '';
-                
-                // --- 关键修复：处理Windows换行符问题 ---
-                // 删除所有回车符(\r)，解决URL末尾出现%0D的问题
-                const cleanedData = data.replace(/\r/g, '');
-                
-                // 分割为行并移除空行
-                const lines = cleanedData.trim().split('\n');
-                
-                // 添加标题显示文件数量
-                const title = document.createElement('h2');
-                title.className = 'file-title';
-                title.textContent = `游戏文件 (${lines.length})`;
-                container.appendChild(title);
-                
-                // 遍历所有文件行
-                lines.forEach(line => {
-                    // 跳过空行
-                    if (!line.trim()) return;
-                    
-                    // 按第一个冒号分割（防止URL中有多余冒号）
-                    const colonIndex = line.indexOf(':');
-                    if (colonIndex === -1) return; // 跳过格式错误的行
-                    
-                    // 解析文件名和URL
-                    const fileName = line.substring(0, colonIndex);
-                    let fileUrl = line.substring(colonIndex + 1);
-                    
-                    // 再次确保URL没有换行符
-                    fileUrl = fileUrl.trim();
-                    
-                    // 创建文件条目链接
-                    const link = document.createElement('a');
-                    link.className = 'file-entry';
-                    
-                    // 使用encodeURI安全编码URL
-                    const encodedUrl = encodeURI(fileUrl); 
-                    link.href = encodedUrl;
-                    link.target = '_blank';
-                    link.innerHTML = `› ${fileName}`;
-                    
-                    // 添加到容器
-                    container.appendChild(link);
-                });
-            })
-            .catch(error => {
-                // 错误处理
-                console.error('加载错误:', error);
-                container.innerHTML = `<p style="color:#f00">错误: 文件列表未找到 (${error.message})</p>`;
-            });
-    }
-
-    /**
-     * 初始化数字矩阵雨特效
-     * 实现原理：Canvas动画 + 随机字符生成
-     */
-    function createMatrixEffect() {
-        const canvas = document.getElementById('matrixCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // 初始化画布尺寸（覆盖整个视口）
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        // 字符动画配置
-        const config = {
-            fontSize: 15,                   // 字符大小
-            fontFamily: 'MS Gothic',         // 字体选择（等宽字体）
-            charSet: "abcdefghijklmnopqrstuvwxyz", // 字符集
-            textColor: '#0F0'                // 字符颜色（绿色主题）
+        // 文件分类图标映射
+        const categoryIcons = {
+            'Games': 'fa-gamepad',
+            'Tools': 'fa-tools',
+            'Study': 'fa-graduation-cap',
+            'Other': 'fa-folder'
         };
 
-        // 计算列数（基于画布宽度和字体大小）
-        const columnCount = Math.floor(canvas.width / config.fontSize);
-        
-        // 初始化每列的Y轴起始位置（瀑布流起点）
-        const verticalPositions = new Array(columnCount).fill(0);
+        // 文件类型图标映射
+        const fileIcons = {
+            '.exe': 'fa-windows',
+            '.7z': 'fa-file-archive',
+            '.zip': 'fa-file-archive',
+            'default': 'fa-file'
+        };
 
         /**
-         * 绘制每一帧的动画
+         * 从服务器加载文件列表
          */
-        function drawFrame() {
-            // 添加残影效果（透明黑色覆盖）
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        async function loadFileList() {
+            const container = document.getElementById('file-categories');
             
-            // 设置文本样式
-            ctx.fillStyle = config.textColor;
-            ctx.font = `${config.fontSize}px ${config.fontFamily}`;
-
-            // 逐列绘制字符（瀑布流效果）
-            verticalPositions.forEach((yPos, index) => {
-                // 随机选择字符
-                const randomChar = config.charSet[
-                    Math.floor(Math.random() * config.charSet.length)
-                ];
+            try {
+                // 显示加载状态
+                container.innerHTML = `
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">正在加载文件列表...</div>
+                    </div>
+                `;
                 
-                // 计算当前字符位置
-                const x = index * config.fontSize;
-                const y = yPos * config.fontSize;
-
-                // 绘制字符
-                ctx.fillText(randomChar, x, y);
-
-                // 如果字符超出屏幕底部且满足随机条件，重置到顶部
-                if (y > canvas.height && Math.random() > 0.975) {
-                    verticalPositions[index] = 0;
+                // 从同级目录下的files/files.txt加载文件列表
+                const response = await fetch('./files/files.txt');
+                
+                if (!response.ok) {
+                    throw new Error(`文件未找到: ${response.status} ${response.statusText}`);
                 }
                 
-                // 该列位置下移
-                verticalPositions[index]++;
-            });
-
-            // 请求下一帧动画
-            requestAnimationFrame(drawFrame);
+                const data = await response.text();
+                
+                // 解析并渲染文件列表
+                renderFileList(data);
+                
+            } catch (error) {
+                console.error('加载文件列表时出错:', error);
+                
+                // 显示错误信息
+                container.innerHTML = `
+                    <div class="error-container">
+                        <i class="fas fa-exclamation-triangle error-icon"></i>
+                        <div>加载文件列表失败: ${error.message}</div>
+                        <button class="retry-btn" onclick="loadFileList()">
+                            <i class="fas fa-redo"></i> 重新加载
+                        </button>
+                    </div>
+                `;
+            }
         }
 
-        // 窗口尺寸变化监听
-        window.addEventListener('resize', () => {
-            // 调整画布尺寸适应窗口变化
+        /**
+         * 解析文件数据并渲染文件列表
+         */
+        function renderFileList(fileData) {
+            const container = document.getElementById('file-categories');
+            
+            // 按分类解析文件数据
+            const categories = {};
+            let currentCategory = '';
+            
+            // --- 关键修复：处理Windows换行符问题 ---
+            // 删除所有回车符(\r)，解决URL末尾出现%0D的问题
+            const cleanedData = fileData.replace(/\r/g, '');
+            
+            const lines = cleanedData.split('\n');
+            
+            lines.forEach(line => {
+                // 跳过空行
+                if (!line.trim()) return;
+                
+                if (line.startsWith('-')) {
+                    // 新分类
+                    currentCategory = line.substring(1, line.length - 1);
+                    categories[currentCategory] = [];
+                } else if (line.includes(':') && currentCategory) {
+                    // 文件条目
+                    const colonIndex = line.indexOf(':');
+                    const fileName = line.substring(0, colonIndex).trim();
+                    let fileUrl = line.substring(colonIndex + 1).trim();
+                    
+                    // 再次确保URL没有换行符和其他空白字符
+                    fileUrl = fileUrl.replace(/\s/g, '');
+                    
+                    categories[currentCategory].push({
+                        name: fileName,
+                        url: fileUrl
+                    });
+                }
+            });
+            
+            // 如果没有找到任何分类，显示空状态
+            if (Object.keys(categories).length === 0) {
+                container.innerHTML = `
+                    <div class="error-container">
+                        <i class="fas fa-folder-open error-icon"></i>
+                        <div>文件列表为空或格式不正确</div>
+                        <button class="retry-btn" onclick="loadFileList()">
+                            <i class="fas fa-redo"></i> 重新加载
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 渲染每个分类
+            container.innerHTML = '';
+            
+            Object.keys(categories).forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                
+                // 分类标题
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'category-header';
+                
+                const icon = document.createElement('i');
+                icon.className = `fas ${categoryIcons[category] || 'fa-folder'} category-icon`;
+                
+                const title = document.createElement('h3');
+                title.className = 'category-title';
+                title.textContent = category;
+                
+                const count = document.createElement('span');
+                count.className = 'file-count';
+                count.textContent = `${categories[category].length} 个文件`;
+                
+                headerDiv.appendChild(icon);
+                headerDiv.appendChild(title);
+                headerDiv.appendChild(count);
+                categoryDiv.appendChild(headerDiv);
+                
+                // 文件列表
+                const fileListDiv = document.createElement('div');
+                fileListDiv.className = 'file-list';
+                
+                categories[category].forEach(file => {
+                    const fileItem = document.createElement('a');
+                    fileItem.className = 'file-item';
+                    fileItem.href = file.url;
+                    fileItem.target = '_blank';
+                    
+                    // 文件图标
+                    const fileIcon = document.createElement('i');
+                    let iconClass = 'fa-file';
+                    
+                    // 根据文件扩展名确定图标
+                    Object.keys(fileIcons).forEach(ext => {
+                        if (file.url.toLowerCase().includes(ext)) {
+                            iconClass = fileIcons[ext];
+                        }
+                    });
+                    
+                    fileIcon.className = `fas ${iconClass} file-icon`;
+                    
+                    // 文件信息
+                    const fileInfo = document.createElement('div');
+                    fileInfo.className = 'file-info';
+                    
+                    const fileName = document.createElement('div');
+                    fileName.className = 'file-name';
+                    fileName.textContent = file.name;
+                    
+                    const fileDesc = document.createElement('div');
+                    fileDesc.className = 'file-desc';
+                    fileDesc.textContent = '点击下载';
+                    
+                    fileInfo.appendChild(fileName);
+                    fileInfo.appendChild(fileDesc);
+                    
+                    // 下载按钮
+                    const downloadBtn = document.createElement('a');
+                    downloadBtn.className = 'download-btn';
+                    downloadBtn.href = file.url;
+                    downloadBtn.target = '_blank';
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> 下载';
+                    
+                    fileItem.appendChild(fileIcon);
+                    fileItem.appendChild(fileInfo);
+                    fileItem.appendChild(downloadBtn);
+                    
+                    fileListDiv.appendChild(fileItem);
+                });
+                
+                categoryDiv.appendChild(fileListDiv);
+                container.appendChild(categoryDiv);
+            });
+        }
+
+        // 矩阵雨特效
+        function createMatrixEffect() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+
+            const config = {
+                fontSize: 16,
+                fontFamily: 'monospace',
+                charSet: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~",
+                textColor: '#1e90ff'
+            };
+
+            const columnCount = Math.floor(canvas.width / config.fontSize);
+            const verticalPositions = new Array(columnCount).fill(0);
+
+            function drawFrame() {
+                ctx.fillStyle = 'rgba(10, 14, 23, 0.06)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = config.textColor;
+                ctx.font = `${config.fontSize}px ${config.fontFamily}`;
+
+                verticalPositions.forEach((yPos, index) => {
+                    const randomChar = config.charSet[
+                        Math.floor(Math.random() * config.charSet.length)
+                    ];
+                    
+                    const x = index * config.fontSize;
+                    const y = yPos * config.fontSize;
+
+                    ctx.fillText(randomChar, x, y);
+
+                    if (y > canvas.height && Math.random() > 0.975) {
+                        verticalPositions[index] = 0;
+                    }
+                    
+                    verticalPositions[index]++;
+                });
+
+                requestAnimationFrame(drawFrame);
+            }
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+
+            drawFrame();
+        }
+
+        // 页面加载后初始化
+        window.addEventListener('load', () => {
+            // 启动矩阵雨特效
+            createMatrixEffect();
+            
+            // 加载文件列表
+            loadFileList();
+            
+            // 可选：每30秒自动刷新文件列表
+            // setInterval(loadFileList, 30000);
         });
-
-        // 启动动画
-        drawFrame();
-    }
-
-    /**
-     * 页面加载后初始化
-     */
-    window.addEventListener('load', () => {
-        // 启动矩阵动画效果
-        createMatrixEffect();
-        
-        // 加载文件列表
-        loadFileList();
-        
-        // 每30秒刷新一次文件列表（可选）
-        setInterval(loadFileList, 30000);
-    });
     </script>
 </body>
 </html>
