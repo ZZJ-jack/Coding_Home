@@ -1,6 +1,9 @@
-Pvz-2.4.6(植物大战僵尸):https://gitcode.com/ZZJ-JACK/Pvz/releases/download/V2.4.6/Pvz-2.4.6-Setup.exe
+-Games:
+Pvz-2.4.6:https://gitcode.com/ZZJ-JACK/Pvz/releases/download/V2.4.6/Pvz-2.4.6-Setup.exe
 五子棋:https://gitcode.com/ZZJ-JACK/Drive/releases/download/五子棋-V1.0/五子棋.7z
+-Tools:
 网络联机客户端:https://gitcode.com/ZZJ-JACK/Drive/releases/download/工具/client.exe
 信息队Dev-Cpp(TDM-GCC10.3.0):https://gitcode.com/ZZJ-JACK/Drive/releases/download/Dev-Cpp/Dev-Cpp-V6.7.5-Setup.exe
 信息队Dev-Cpp(MinGW15.2.0):https://gitcode.com/ZZJ-JACK/Drive/releases/download/Dev-Cpp/Dev-Cpp-MinGW15.3.0.exe
-2025中山市信息学邀请赛初中:https://gitcode.com/ZZJ-JACK/Drive/releases/download/信息学/2025中山市信息学邀请赛初中组.zip
+-Other:
+2025中山市信息学邀请赛初中组文件:https://gitcode.com/ZZJ-JACK/Drive/releases/download/信息学/2025中山市信息学邀请赛初中组.zip
