@@ -1,5 +1,4 @@
 -Games:
-Pvz-2.4.6:https://gitcode.com/ZZJ-JACK/Pvz/releases/download/V2.4.6/Pvz-2.4.6-Setup.exe
 Pvz-2.4.7:https://gitcode.com/ZZJ-JACK/Pvz/releases/download/V2.4.7/Pvz-V2.4.7-Portable.exe
 Pvz-2.4.8:https://gitcode.com/ZZJ-JACK/Pvz/releases/download/V2.4.8/Pvz-V2.4.8-Setup.exe
 五子棋:https://gitcode.com/ZZJ-JACK/Drive/releases/download/五子棋-V1.0/五子棋.7z
