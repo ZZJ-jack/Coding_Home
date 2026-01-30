@@ -131,6 +131,10 @@
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 15px rgba(46, 213, 115, 0.3);
             display: inline-block;
+            /* 修复页面抖动问题的关键：设置最小高度和垂直对齐 */
+            min-height: 4.5rem;
+            line-height: 1.2;
+            vertical-align: top;
         }
         
         .typing-cursor {
@@ -141,6 +145,8 @@
             margin-left: 5px;
             animation: blink 1s infinite;
             vertical-align: middle;
+            /* 确保光标位置稳定 */
+            margin-top: 0.5rem;
         }
         
         @keyframes blink {
@@ -225,6 +231,11 @@
         @media (max-width: 768px) {
             .welcome-text {
                 font-size: 2.5rem;
+                min-height: 3.5rem;
+            }
+            
+            .typing-cursor {
+                height: 2.5rem;
             }
             
             .subtitle {
@@ -255,6 +266,9 @@
             <div class="nav-buttons">
                 <a href="files.html" class="nav-button">
                     <i class="fas fa-folder"></i> 文件
+                </a>
+                <a href="sitego.html" class="nav-button">
+                    <i class="fas fa-globe"></i> 网址导航
                 </a>
                 <a href="about.html" class="nav-button">
                     <i class="fas fa-info-circle"></i> 关于
