@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网址导航 - Coding</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #0a0e17;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(46, 213, 115, 0.3);
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #2ed573;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2ed573, #1e90ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(46, 213, 115, 0.5);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-button {
+            position: relative;
+            padding: 12px 24px;
+            background: rgba(30, 144, 255, 0.1);
+            border: 1px solid rgba(30, 144, 255, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(30, 144, 255, 0.4), transparent);
+            transition: left 0.5s;
+            z-index: -1;
+        }
+        
+        .nav-button:hover::before {
+            left: 100%;
+        }
+        
+        .nav-button:hover {
+            background: rgba(30, 144, 255, 0.2);
+            border-color: rgba(30, 144, 255, 0.6);
+            box-shadow: 0 0 15px rgba(30, 144, 255, 0.4);
+            transform: translateY(-3px);
+        }
+        
+        .nav-button i {
+            margin-right: 8px;
+        }
+        
+        .page-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #2ed573, #1e90ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(46, 213, 115, 0.3);
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #a0a0a0;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .site-search {
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(20, 25, 40, 0.6);
+            border: 1px solid rgba(46, 213, 115, 0.2);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: rgba(46, 213, 115, 0.5);
+            box-shadow: 0 0 15px rgba(46, 213, 115, 0.3);
+        }
+        
+        .search-input::placeholder {
+            color: #888;
+        }
+        
+        .sites-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+        
+        .site-card {
+            background: rgba(20, 25, 40, 0.6);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(46, 213, 115, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .site-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(46, 213, 115, 0.5);
+        }
+        
+        .site-icon {
+            font-size: 2rem;
+            color: #2ed573;
+            margin-bottom: 15px;
+        }
+        
+        .site-name {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #e0e0e0;
+        }
+        
+        .site-url {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+        
+        .site-link {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(46, 213, 115, 0.1);
+            border: 1px solid rgba(46, 213, 115, 0.3);
+            border-radius: 6px;
+            color: #2ed573;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .site-link:hover {
+            background: rgba(46, 213, 115, 0.2);
+            border-color: rgba(46, 213, 115, 0.6);
+            box-shadow: 0 0 10px rgba(46, 213, 115, 0.4);
+        }
+        
+        .no-results {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 40px;
+            color: #888;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(46, 213, 115, 0.3);
+            margin-top: 60px;
+        }
+        
+        .footer-text {
+            color: #a0a0a0;
+            margin-bottom: 10px;
+        }
+        
+        .footer-link {
+            color: #2ed573;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: #1e90ff;
+            text-decoration: underline;
+        }
+        
+        .team-name {
+            font-weight: 600;
+            color: #2ed573;
+        }
+        
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .sites-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #2ed573;
+            font-size: 1.2rem;
+            grid-column: 1 / -1;
+        }
+        
+        .auto-icon {
+            font-size: 2rem;
+            color: #2ed573;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-globe logo-icon"></i>
+                <div class="logo-text">网址导航</div>
+            </div>
+            
+            <div class="nav-buttons">
+                <a href="index.html" class="nav-button">
+                    <i class="fas fa-home"></i> 主页
+                </a>
+                <a href="files.html" class="nav-button">
+                    <i class="fas fa-folder"></i> 文件
+                </a>
+                <a href="about.html" class="nav-button">
+                    <i class="fas fa-info-circle"></i> 关于
+                </a>
+            </div>
+        </header>
+        
+        <section class="page-title">
+            网址导航
+        </section>
+        
+        <p class="subtitle">精选实用网站资源，快速访问，提高工作效率</p>
+        
+        <div class="site-search">
+            <input type="text" id="searchInput" class="search-input" placeholder="搜索网站名称或网址...">
+        </div>
+        
+        <div class="sites-container" id="sitesContainer">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i> 正在加载网站列表...
+            </div>
+        </div>
+        
+        <footer>
+            <p class="footer-text">Developed by <a href="https://zzjjack.us.kg" class="footer-link">ZZJ</a> and <span class="team-name">Coding Team</span></p>
+            <p class="footer-text">2025, Coding - 网址导航</p>
+        </footer>
+    </div>
+
+    <script>
+        // 矩阵雨特效
+        function createMatrixEffect() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const config = {
+                fontSize: 16,
+                fontFamily: 'monospace',
+                charSet: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~",
+                textColor: '#1e90ff'
+            };
+
+            const columnCount = Math.floor(canvas.width / config.fontSize);
+            const verticalPositions = new Array(columnCount).fill(0);
+
+            function drawFrame() {
+                ctx.fillStyle = 'rgba(10, 14, 23, 0.06)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = config.textColor;
+                ctx.font = `${config.fontSize}px ${config.fontFamily}`;
+
+                verticalPositions.forEach((yPos, index) => {
+                    const randomChar = config.charSet[
+                        Math.floor(Math.random() * config.charSet.length)
+                    ];
+                    
+                    const x = index * config.fontSize;
+                    const y = yPos * config.fontSize;
+
+                    ctx.fillText(randomChar, x, y);
+
+                    if (y > canvas.height && Math.random() > 0.975) {
+                        verticalPositions[index] = 0;
+                    }
+                    
+                    verticalPositions[index]++;
+                });
+
+                requestAnimationFrame(drawFrame);
+            }
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+
+            drawFrame();
+        }
+
+        // 根据网站类型自动选择图标
+        function getAutoIcon(name, url) {
+            const lowerName = name.toLowerCase();
+            const lowerUrl = url.toLowerCase();
+            
+            // 根据网站名称匹配图标
+            if (lowerName.includes('pvz') || lowerName.includes('plant') || lowerName.includes('zombie')) {
+                return 'fas fa-leaf';
+            } else if (lowerName.includes('google')) {
+                return 'fab fa-google';
+            } else if (lowerName.includes('github') || lowerName.includes('git')) {
+                return 'fab fa-github';
+            } else if (lowerName.includes('youtube')) {
+                return 'fab fa-youtube';
+            } else if (lowerName.includes('twitter')) {
+                return 'fab fa-twitter';
+            } else if (lowerName.includes('facebook')) {
+                return 'fab fa-facebook';
+            } else if (lowerName.includes('instagram')) {
+                return 'fab fa-instagram';
+            } else if (lowerName.includes('chatgpt') || lowerName.includes('ai') || lowerName.includes('gpt')) {
+                return 'fas fa-robot';
+            } else if (lowerName.includes('stack') || lowerName.includes('overflow')) {
+                return 'fab fa-stack-overflow';
+            } else if (lowerName.includes('vue')) {
+                return 'fab fa-vuejs';
+            } else if (lowerName.includes('react')) {
+                return 'fab fa-react';
+            } else if (lowerName.includes('bootstrap')) {
+                return 'fab fa-bootstrap';
+            } else if (lowerName.includes('font') || lowerName.includes('awesome')) {
+                return 'fas fa-icons';
+            } else if (lowerName.includes('mdn') || lowerName.includes('mozilla')) {
+                return 'fab fa-mdn';
+            } else if (lowerName.includes('tailwind')) {
+                return 'fas fa-wind';
+            } else if (lowerName.includes('node') || lowerName.includes('npm')) {
+                return 'fab fa-node-js';
+            } else if (lowerName.includes('python')) {
+                return 'fab fa-python';
+            } else if (lowerName.includes('docker')) {
+                return 'fab fa-docker';
+            } else if (lowerName.includes('aws') || lowerName.includes('amazon')) {
+                return 'fab fa-aws';
+            } else if (lowerName.includes('microsoft') || lowerName.includes('azure')) {
+                return 'fab fa-microsoft';
+            } else if (lowerName.includes('apple')) {
+                return 'fab fa-apple';
+            } else if (lowerName.includes('linux')) {
+                return 'fab fa-linux';
+            } else if (lowerName.includes('android')) {
+                return 'fab fa-android';
+            } else if (lowerName.includes('html')) {
+                return 'fab fa-html5';
+            } else if (lowerName.includes('css')) {
+                return 'fab fa-css3-alt';
+            } else if (lowerName.includes('js') || lowerName.includes('javascript')) {
+                return 'fab fa-js';
+            } else if (lowerName.includes('game') || lowerName.includes('play')) {
+                return 'fas fa-gamepad';
+            } else if (lowerName.includes('music') || lowerName.includes('spotify')) {
+                return 'fas fa-music';
+            } else if (lowerName.includes('video') || lowerName.includes('movie')) {
+                return 'fas fa-video';
+            } else if (lowerName.includes('book') || lowerName.includes('read')) {
+                return 'fas fa-book';
+            } else if (lowerName.includes('news') || lowerName.includes('blog')) {
+                return 'fas fa-newspaper';
+            } else if (lowerName.includes('shopping') || lowerName.includes('shop') || lowerName.includes('amazon') || lowerName.includes('taobao')) {
+                return 'fas fa-shopping-cart';
+            } else if (lowerName.includes('bank') || lowerName.includes('pay') || lowerName.includes('alipay') || lowerName.includes('wechat')) {
+                return 'fas fa-credit-card';
+            } else if (lowerName.includes('cloud') || lowerName.includes('storage')) {
+                return 'fas fa-cloud';
+            } else if (lowerName.includes('mail') || lowerName.includes('email') || lowerName.includes('gmail')) {
+                return 'fas fa-envelope';
+            } else if (lowerName.includes('map') || lowerName.includes('location')) {
+                return 'fas fa-map-marker-alt';
+            } else if (lowerName.includes('weather') || lowerName.includes('climate')) {
+                return 'fas fa-cloud-sun';
+            }
+            
+            // 根据URL域名匹配图标
+            if (lowerUrl.includes('github.com')) {
+                return 'fab fa-github';
+            } else if (lowerUrl.includes('google.com')) {
+                return 'fab fa-google';
+            } else if (lowerUrl.includes('youtube.com')) {
+                return 'fab fa-youtube';
+            }
+            
+            // 默认图标
+            return 'fas fa-globe';
+        }
+
+        // 加载网站数据并生成卡片
+        async function loadSites() {
+            const sitesContainer = document.getElementById('sitesContainer');
+            const searchInput = document.getElementById('searchInput');
+            
+            try {
+                // 从 files/sites.txt 读取数据
+                const response = await fetch('files/sites.txt');
+                const text = await response.text();
+                
+                // 解析数据 - 每行格式：网站名称:网址
+                const sites = text.trim().split('\n')
+                    .filter(line => line.trim() !== '')
+                    .map(line => {
+                        const [name, url] = line.split(':').map(item => item.trim());
+                        return { 
+                            name, 
+                            url: url.startsWith('http') ? url : `https://${url}`,
+                            icon: getAutoIcon(name, url)
+                        };
+                    });
+                
+                // 初始渲染
+                renderSites(sites);
+                
+                // 搜索功能
+                searchInput.addEventListener('input', () => {
+                    const searchTerm = searchInput.value.toLowerCase();
+                    const filteredSites = sites.filter(site => 
+                        site.name.toLowerCase().includes(searchTerm) || 
+                        site.url.toLowerCase().includes(searchTerm)
+                    );
+                    renderSites(filteredSites);
+                });
+                
+            } catch (error) {
+                console.error('加载网站数据失败:', error);
+                sitesContainer.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        <p>无法加载网站数据，请检查 files/sites.txt 文件是否存在</p>
+                        <p>文件格式：网站名称:网址</p>
+                        <p>示例：PVZ:https://pvz.gocoding.dpdns.org</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function renderSites(sites) {
+            const sitesContainer = document.getElementById('sitesContainer');
+            
+            if (sites.length === 0) {
+                sitesContainer.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i> 
+                        <p>未找到匹配的网站</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            sitesContainer.innerHTML = sites.map(site => `
+                <div class="site-card">
+                    <i class="${site.icon} site-icon"></i>
+                    <h3 class="site-name">${site.name}</h3>
+                    <p class="site-url">${site.url}</p>
+                    <a href="${site.url}" target="_blank" class="site-link">
+                        <i class="fas fa-external-link-alt"></i> 访问网站
+                    </a>
+                </div>
+            `).join('');
+        }
+        
+        // 页面加载后执行
+        window.addEventListener('load', () => {
+            createMatrixEffect();
+            loadSites();
+        });
+    </script>
+</body>
+</html>
