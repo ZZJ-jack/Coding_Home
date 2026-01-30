@@ -329,7 +329,7 @@
         
         <footer>
             <p class="footer-text">Developed by <a href="https://zzjjack.us.kg" class="footer-link">ZZJ</a> and <span class="team-name">Coding Team</span></p>
-            <p class="footer-text">2025, Coding - 网址导航</p>
+            <p class="footer-text">2026, Coding</p>
         </footer>
     </div>
 
@@ -401,7 +401,7 @@
                 return 'fab fa-github';
             } else if (lowerName.includes('youtube')) {
                 return 'fab fa-youtube';
-            } else if (lowerName.includes('twitter')) {
+            } else if (lowerName.includes('twitter') || lowerName.includes('x.com')) {
                 return 'fab fa-twitter';
             } else if (lowerName.includes('facebook')) {
                 return 'fab fa-facebook';
@@ -445,28 +445,38 @@
                 return 'fab fa-css3-alt';
             } else if (lowerName.includes('js') || lowerName.includes('javascript')) {
                 return 'fab fa-js';
-            } else if (lowerName.includes('game') || lowerName.includes('play')) {
+            } else if (lowerName.includes('game') || lowerName.includes('play') || lowerName.includes('游戏')) {
                 return 'fas fa-gamepad';
-            } else if (lowerName.includes('music') || lowerName.includes('spotify')) {
+            } else if (lowerName.includes('music') || lowerName.includes('spotify') || lowerName.includes('音乐')) {
                 return 'fas fa-music';
-            } else if (lowerName.includes('video') || lowerName.includes('movie')) {
+            } else if (lowerName.includes('video') || lowerName.includes('movie') || lowerName.includes('影视')) {
                 return 'fas fa-video';
-            } else if (lowerName.includes('book') || lowerName.includes('read')) {
+            } else if (lowerName.includes('book') || lowerName.includes('read') || lowerName.includes('书籍')) {
                 return 'fas fa-book';
-            } else if (lowerName.includes('news') || lowerName.includes('blog')) {
+            } else if (lowerName.includes('news') || lowerName.includes('blog') || lowerName.includes('新闻')) {
                 return 'fas fa-newspaper';
-            } else if (lowerName.includes('shopping') || lowerName.includes('shop') || lowerName.includes('amazon') || lowerName.includes('taobao')) {
+            } else if (lowerName.includes('shopping') || lowerName.includes('shop') || lowerName.includes('amazon') || lowerName.includes('taobao') || lowerName.includes('购物')) {
                 return 'fas fa-shopping-cart';
-            } else if (lowerName.includes('bank') || lowerName.includes('pay') || lowerName.includes('alipay') || lowerName.includes('wechat')) {
+            } else if (lowerName.includes('bank') || lowerName.includes('pay') || lowerName.includes('alipay') || lowerName.includes('wechat') || lowerName.includes('支付')) {
                 return 'fas fa-credit-card';
-            } else if (lowerName.includes('cloud') || lowerName.includes('storage')) {
+            } else if (lowerName.includes('cloud') || lowerName.includes('storage') || lowerName.includes('云')) {
                 return 'fas fa-cloud';
-            } else if (lowerName.includes('mail') || lowerName.includes('email') || lowerName.includes('gmail')) {
+            } else if (lowerName.includes('mail') || lowerName.includes('email') || lowerName.includes('gmail') || lowerName.includes('邮件')) {
                 return 'fas fa-envelope';
-            } else if (lowerName.includes('map') || lowerName.includes('location')) {
+            } else if (lowerName.includes('map') || lowerName.includes('location') || lowerName.includes('地图')) {
                 return 'fas fa-map-marker-alt';
-            } else if (lowerName.includes('weather') || lowerName.includes('climate')) {
+            } else if (lowerName.includes('weather') || lowerName.includes('climate') || lowerName.includes('天气')) {
                 return 'fas fa-cloud-sun';
+            } else if (lowerName.includes('bilibili') || lowerName.includes('b站')) {
+                return 'fas fa-play-circle';
+            } else if (lowerName.includes('weibo')) {
+                return 'fab fa-weibo';
+            } else if (lowerName.includes('qq')) {
+                return 'fab fa-qq';
+            } else if (lowerName.includes('weixin') || lowerName.includes('微信')) {
+                return 'fab fa-weixin';
+            } else if (lowerName.includes('baidu') || lowerName.includes('百度')) {
+                return 'fas fa-search';
             }
             
             // 根据URL域名匹配图标
@@ -476,6 +486,10 @@
                 return 'fab fa-google';
             } else if (lowerUrl.includes('youtube.com')) {
                 return 'fab fa-youtube';
+            } else if (lowerUrl.includes('bilibili.com')) {
+                return 'fas fa-play-circle';
+            } else if (lowerUrl.includes('baidu.com')) {
+                return 'fas fa-search';
             }
             
             // 默认图标
@@ -496,13 +510,25 @@
                 const sites = text.trim().split('\n')
                     .filter(line => line.trim() !== '')
                     .map(line => {
-                        const [name, url] = line.split(':').map(item => item.trim());
+                        // 正确处理冒号分隔符，只分割第一个冒号
+                        const firstColonIndex = line.indexOf(':');
+                        if (firstColonIndex === -1) return null;
+                        
+                        const name = line.substring(0, firstColonIndex).trim();
+                        let url = line.substring(firstColonIndex + 1).trim();
+                        
+                        // 确保URL有协议头
+                        if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+                            url = 'https://' + url;
+                        }
+                        
                         return { 
                             name, 
-                            url: url.startsWith('http') ? url : `https://${url}`,
+                            url,
                             icon: getAutoIcon(name, url)
                         };
-                    });
+                    })
+                    .filter(site => site !== null && site.name && site.url);
                 
                 // 初始渲染
                 renderSites(sites);
@@ -525,6 +551,7 @@
                         <p>无法加载网站数据，请检查 files/sites.txt 文件是否存在</p>
                         <p>文件格式：网站名称:网址</p>
                         <p>示例：PVZ:https://pvz.gocoding.dpdns.org</p>
+                        <p>或者：Google:google.com</p>
                     </div>
                 `;
             }
@@ -533,7 +560,7 @@
         function renderSites(sites) {
             const sitesContainer = document.getElementById('sitesContainer');
             
-            if (sites.length === 0) {
+            if (!sites || sites.length === 0) {
                 sitesContainer.innerHTML = `
                     <div class="no-results">
                         <i class="fas fa-search"></i> 
