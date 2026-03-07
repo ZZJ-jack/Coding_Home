@@ -9,3 +9,4 @@ HMCL-3.9.1(MC):https://gitcode.com/ZZJ-JACK/Drive/releases/download/HMCL-3.9.1/H
 -Other:
 2025中山市信息学邀请赛初中组文件:https://gitcode.com/ZZJ-JACK/Drive/releases/download/信息学/2025中山市信息学邀请赛初中组.zip
 BandZIP去广告:https://gitcode.com/ZZJ-JACK/Drive/releases/download/BandZIP去广告/skin.data
+文件默认打开方式一键修改:https://raw.gitcode.com/ZZJ-JACK/Drive/blobs/文件默认打开方式一键修改.bat
