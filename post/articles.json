@@ -1,9 +1,0 @@
-{
-  "articles": [
-    {
-      "title": "图论最短路算法详解：BFS、SPFA、Dijkstra 与链式前向星",
-      "date": "2026-05-28",
-      "path": "./post/2026-05-28-shortest-path-algorithms-comparison.md"
-    }
-  ]
-}
