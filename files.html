@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding · 文件中心</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+        body { background:#0a0e17; color:#e0e0e0; overflow-x:hidden; min-height:100vh; }
+        .matrix-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; }
+        .container { max-width:1200px; margin:0 auto; padding:20px; }
+        header { display:flex; justify-content:space-between; align-items:center; padding:20px 0; border-bottom:1px solid rgba(46,213,115,0.3); margin-bottom:40px; flex-wrap:wrap; gap:20px; }
+        .logo { display:flex; align-items:center; gap:15px; }
+        .logo-icon { font-size:2.5rem; color:#2ed573; }
+        .logo-text { font-size:2rem; font-weight:700; background:linear-gradient(90deg,#2ed573,#1e90ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .nav-buttons { display:flex; gap:20px; }
+        .nav-button { padding:12px 24px; background:rgba(30,144,255,0.1); border:1px solid rgba(30,144,255,0.3); border-radius:8px; color:#e0e0e0; text-decoration:none; font-weight:600; transition:0.3s; }
+        .nav-button:hover { background:rgba(30,144,255,0.2); transform:translateY(-3px); }
+        .nav-button i { margin-right:8px; }
+        .section-title { font-size:2rem; margin-bottom:30px; color:#2ed573; }
+        .file-categories { display:flex; flex-direction:column; gap:30px; }
+        .category { background:rgba(20,25,40,0.6); border-radius:12px; padding:25px; border:1px solid rgba(46,213,115,0.2); }
+        .category-header { display:flex; align-items:center; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid rgba(46,213,115,0.2); flex-wrap:wrap; gap:10px; }
+        .category-icon { font-size:1.8rem; color:#2ed573; margin-right:15px; }
+        .category-title { font-size:1.5rem; }
+        .file-count { margin-left:auto; background:rgba(46,213,115,0.2); padding:5px 10px; border-radius:20px; }
+        .file-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:15px; }
+        .file-item { display:flex; align-items:center; padding:15px; background:rgba(30,35,50,0.5); border-radius:8px; border:1px solid rgba(46,213,115,0.1); transition:0.3s; text-decoration:none; color:#e0e0e0; gap:15px; flex-wrap:wrap; }
+        .file-item:hover { background:rgba(30,144,255,0.2); transform:translateY(-5px); }
+        .file-icon { font-size:1.5rem; color:#2ed573; width:30px; text-align:center; }
+        .file-info { flex:1; }
+        .file-name { font-weight:600; margin-bottom:5px; }
+        .file-desc { font-size:0.9rem; color:#a0a0a0; }
+        .download-btn { padding:8px 15px; background:rgba(46,213,115,0.2); border-radius:6px; color:#2ed573; text-decoration:none; font-size:0.9rem; white-space:nowrap; }
+        .loading-container, .error-container { display:flex; justify-content:center; align-items:center; padding:60px 0; flex-direction:column; gap:20px; }
+        .loading-spinner { width:50px; height:50px; border:5px solid rgba(46,213,115,0.2); border-top:5px solid #2ed573; border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { 0%{transform:rotate(0deg);}100%{transform:rotate(360deg);} }
+        footer { text-align:center; padding:30px 0; border-top:1px solid rgba(46,213,115,0.3); margin-top:60px; }
+        .footer-link { color:#2ed573; text-decoration:none; }
+        @media (max-width:768px){ .nav-buttons{ flex-direction:column; width:100%; } .file-list{ grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+<canvas class="matrix-canvas" id="matrixCanvas"></canvas>
+<div class="container">
+    <header>
+        <div class="logo"><i class="fas fa-code logo-icon"></i><div class="logo-text">Coding</div></div>
+        <div class="nav-buttons"><a href="index.html" class="nav-button"><i class="fas fa-home"></i> 主页</a></div>
+    </header>
+    <section class="files-section"><h2 class="section-title">文件中心</h2><div id="file-categories" class="file-categories"><div class="loading-container"><div class="loading-spinner"></div><div class="loading-text">加载文件列表...</div></div></div></section>
+    <footer><p class="footer-text">Developed by <a href="https://zzjjack.us.kg" class="footer-link" target="_blank">ZZJ</a> and <a href="https://www.luogu.com.cn/team/104545" class="footer-link" target="_blank">Coding Team</a></p><p class="footer-text">2026, Coding</p></footer>
+</div>
+<script>
+    const categoryIcons = { 'Games':'fa-gamepad', 'Tools':'fa-tools', 'Study':'fa-graduation-cap', 'Other':'fa-folder' };
+    async function loadFileList(){
+        const container = document.getElementById('file-categories');
+        try{
+            const resp = await fetch('./files/files.txt');
+            if(!resp.ok) throw new Error('文件列表不存在');
+            const data = await resp.text();
+            const clean = data.replace(/\r/g,'');
+            const lines = clean.split('\n');
+            const categories = {};
+            let curCat = '';
+            for(let line of lines){
+                line=line.trim();
+                if(!line) continue;
+                if(line.startsWith('-')){ curCat = line.substring(1,line.length-1); categories[curCat]=[]; }
+                else if(line.includes(':') && curCat){
+                    const idx=line.indexOf(':');
+                    let name=line.substring(0,idx).trim();
+                    let url=line.substring(idx+1).trim().replace(/\s/g,'');
+                    categories[curCat].push({name,url});
+                }
+            }
+            if(Object.keys(categories).length===0) throw new Error('无有效分类');
+            container.innerHTML='';
+            for(let [cat, files] of Object.entries(categories)){
+                const catDiv = document.createElement('div'); catDiv.className='category';
+                catDiv.innerHTML=`<div class="category-header"><i class="fas ${categoryIcons[cat]||'fa-folder'} category-icon"></i><h3 class="category-title">${cat}</h3><span class="file-count">${files.length} 个文件</span></div><div class="file-list"></div>`;
+                const fileListDiv = catDiv.querySelector('.file-list');
+                files.forEach(f=>{
+                    const a=document.createElement('a'); a.className='file-item'; a.href=f.url; a.target='_blank';
+                    a.innerHTML=`<i class="fas fa-file file-icon"></i><div class="file-info"><div class="file-name">${f.name}</div><div class="file-desc">点击下载</div></div><span class="download-btn"><i class="fas fa-download"></i> 下载</span>`;
+                    fileListDiv.appendChild(a);
+                });
+                container.appendChild(catDiv);
+            }
+        } catch(e){
+            container.innerHTML=`<div class="error-container"><i class="fas fa-exclamation-triangle" style="font-size:3rem;color:#ff6b6b;"></i><div>加载失败: ${e.message}</div><button class="retry-btn" onclick="location.reload()" style="padding:10px 20px;background:#ff6b6b20;border:1px solid #ff6b6b;border-radius:6px;color:#ff6b6b;cursor:pointer;">重试</button></div>`;
+        }
+    }
+    function matrixBg(){ const c=document.getElementById('matrixCanvas'),ctx=c.getContext('2d'); c.width=innerWidth;c.height=innerHeight; const fs=16,chars="01ABCDEF",cols=Math.floor(c.width/fs),drops=new Array(cols).fill(0); function draw(){ ctx.fillStyle='rgba(10,14,23,0.06)'; ctx.fillRect(0,0,c.width,c.height); ctx.fillStyle='#1e90ff'; ctx.font=`${fs}px monospace`; drops.forEach((y,i)=>{ ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*fs,y*fs); if(y*fs>c.height&&Math.random()>0.975) drops[i]=0; drops[i]++; }); requestAnimationFrame(draw); } window.addEventListener('resize',()=>{ c.width=innerWidth; c.height=innerHeight; }); draw(); }
+    window.addEventListener('load',()=>{ matrixBg(); loadFileList(); });
+</script>
+</body>
+</html>

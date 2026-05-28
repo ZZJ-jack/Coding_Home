@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网址导航 · Coding</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background:#0a0e17; color:#e0e0e0; overflow-x:hidden; min-height:100vh; }
+        .matrix-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; }
+        .container { max-width:1200px; margin:0 auto; padding:20px; }
+        header { display:flex; justify-content:space-between; align-items:center; padding:20px 0; border-bottom:1px solid rgba(46,213,115,0.3); margin-bottom:40px; flex-wrap:wrap; gap:20px; }
+        .logo { display:flex; align-items:center; gap:15px; }
+        .logo-icon { font-size:2.5rem; color:#2ed573; }
+        .logo-text { font-size:2rem; font-weight:700; background:linear-gradient(90deg,#2ed573,#1e90ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .nav-buttons { display:flex; gap:20px; }
+        .nav-button { padding:12px 24px; background:rgba(30,144,255,0.1); border:1px solid rgba(30,144,255,0.3); border-radius:8px; color:#e0e0e0; text-decoration:none; font-weight:600; transition:0.3s; }
+        .nav-button:hover { background:rgba(30,144,255,0.2); transform:translateY(-3px); box-shadow:0 0 15px rgba(30,144,255,0.4); }
+        .nav-button i { margin-right:8px; }
+        .page-title { text-align:center; font-size:3rem; font-weight:700; margin-bottom:20px; background:linear-gradient(90deg,#2ed573,#1e90ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .subtitle { text-align:center; font-size:1.3rem; color:#a0a0a0; margin-bottom:40px; }
+        .site-search { max-width:600px; margin:0 auto 40px; }
+        .search-input { width:100%; padding:15px 20px; background:rgba(20,25,40,0.6); border:1px solid rgba(46,213,115,0.2); border-radius:8px; color:#e0e0e0; font-size:1.1rem; }
+        .search-input:focus { outline:none; border-color:#2ed573; box-shadow:0 0 15px rgba(46,213,115,0.3); }
+        .sites-container { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:25px; margin-bottom:60px; }
+        .site-card { background:rgba(20,25,40,0.6); border-radius:12px; padding:25px; border:1px solid rgba(46,213,115,0.2); transition:0.3s; }
+        .site-card:hover { transform:translateY(-5px); border-color:#2ed573; }
+        .site-icon { font-size:2rem; color:#2ed573; margin-bottom:15px; }
+        .site-name { font-size:1.4rem; margin-bottom:10px; }
+        .site-url { color:#888; font-size:0.9rem; margin-bottom:15px; word-break:break-all; }
+        .site-link { display:inline-block; padding:8px 20px; background:rgba(46,213,115,0.1); border:1px solid rgba(46,213,115,0.3); border-radius:6px; color:#2ed573; text-decoration:none; font-weight:600; transition:0.3s; }
+        .site-link:hover { background:rgba(46,213,115,0.2); box-shadow:0 0 10px rgba(46,213,115,0.4); }
+        .no-results, .loading { text-align:center; padding:40px; color:#888; grid-column:1/-1; }
+        footer { text-align:center; padding:30px 0; border-top:1px solid rgba(46,213,115,0.3); margin-top:60px; }
+        .footer-text { color:#a0a0a0; margin-bottom:10px; }
+        .footer-link { color:#2ed573; text-decoration:none; }
+        .footer-link:hover { color:#1e90ff; text-decoration:underline; }
+        @media (max-width:768px) { .nav-buttons { flex-direction:column; width:100%; } .nav-button { text-align:center; } .page-title { font-size:2.5rem; } }
+    </style>
+</head>
+<body>
+<canvas class="matrix-canvas" id="matrixCanvas"></canvas>
+<div class="container">
+    <header>
+        <div class="logo"><i class="fas fa-globe logo-icon"></i><div class="logo-text">网址导航</div></div>
+        <div class="nav-buttons"><a href="index.html" class="nav-button"><i class="fas fa-home"></i> 主页</a></div>
+    </header>
+    <div class="page-title">网址导航</div>
+    <p class="subtitle">精选实用网站资源，快速访问，提高工作效率</p>
+    <div class="site-search"><input type="text" id="searchInput" class="search-input" placeholder="搜索网站名称或网址..."></div>
+    <div class="sites-container" id="sitesContainer"><div class="loading"><i class="fas fa-spinner fa-spin"></i> 正在加载网站列表...</div></div>
+    <footer><p class="footer-text">Developed by <a href="https://zzjjack.us.kg" class="footer-link" target="_blank">ZZJ</a> and <a href="https://www.luogu.com.cn/team/104545" class="footer-link" target="_blank">Coding Team</a></p><p class="footer-text">2026, Coding</p></footer>
+</div>
+<script>
+    function getAutoIcon(name, url) {
+        const n = name.toLowerCase(), u = url.toLowerCase();
+        if(n.includes('google')) return 'fab fa-google';
+        if(n.includes('github')) return 'fab fa-github';
+        if(n.includes('youtube')) return 'fab fa-youtube';
+        if(n.includes('bilibili')) return 'fab fa-bilibili';
+        if(n.includes('chatgpt')||n.includes('gpt')) return 'fas fa-robot';
+        if(n.includes('pvz')) return 'fas fa-leaf';
+        return 'fas fa-globe';
+    }
+    async function loadSites() {
+        const container = document.getElementById('sitesContainer');
+        const searchInput = document.getElementById('searchInput');
+        try {
+            const response = await fetch('files/sites.txt');
+            const text = await response.text();
+            const sites = text.split('\n').filter(l=>l.trim()).map(line=>{
+                const idx = line.indexOf(':');
+                if(idx===-1) return null;
+                let name = line.substring(0,idx).trim();
+                let url = line.substring(idx+1).trim();
+                if(url && !url.startsWith('http')) url = 'https://'+url;
+                return { name, url, icon: getAutoIcon(name,url) };
+            }).filter(s=>s);
+            function render(arr){
+                if(!arr.length){ container.innerHTML='<div class="no-results"><i class="fas fa-search"></i><p>未找到匹配网站</p></div>'; return; }
+                container.innerHTML = arr.map(s=>`<div class="site-card"><i class="${s.icon} site-icon"></i><h3 class="site-name">${s.name}</h3><p class="site-url">${s.url}</p><a href="${s.url}" target="_blank" class="site-link"><i class="fas fa-external-link-alt"></i> 访问网站</a></div>`).join('');
+            }
+            render(sites);
+            searchInput.addEventListener('input',()=>{
+                const kw = searchInput.value.toLowerCase();
+                render(sites.filter(s=>s.name.toLowerCase().includes(kw)||s.url.toLowerCase().includes(kw)));
+            });
+        } catch(e) {
+            container.innerHTML=`<div class="no-results"><i class="fas fa-exclamation-triangle"></i><p>无法加载网站数据，请确保 files/sites.txt 存在</p></div>`;
+        }
+    }
+    function createMatrixEffect(){
+        const c=document.getElementById('matrixCanvas'),ctx=c.getContext('2d');
+        c.width=innerWidth;c.height=innerHeight;
+        const fs=16,chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~",col=Math.floor(c.width/fs),drops=new Array(col).fill(0);
+        function draw(){
+            ctx.fillStyle='rgba(10,14,23,0.06)'; ctx.fillRect(0,0,c.width,c.height);
+            ctx.fillStyle='#1e90ff'; ctx.font=`${fs}px monospace`;
+            drops.forEach((y,i)=>{ ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*fs,y*fs); if(y*fs>c.height&&Math.random()>0.975) drops[i]=0; drops[i]++; });
+            requestAnimationFrame(draw);
+        }
+        window.addEventListener('resize',()=>{ c.width=innerWidth; c.height=innerHeight; });
+        draw();
+    }
+    window.addEventListener('load',()=>{ createMatrixEffect(); loadSites(); });
+</script>
+</body>
+</html>

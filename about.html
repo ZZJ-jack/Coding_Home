@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding · 关于团队</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+        body { background:#0a0e17; color:#e0e0e0; overflow-x:hidden; min-height:100vh; }
+        .matrix-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; }
+        .container { max-width:1200px; margin:0 auto; padding:20px; }
+        header { display:flex; justify-content:space-between; align-items:center; padding:20px 0; border-bottom:1px solid rgba(46,213,115,0.3); margin-bottom:40px; flex-wrap:wrap; gap:20px; }
+        .logo { display:flex; align-items:center; gap:15px; }
+        .logo-icon { font-size:2.5rem; color:#2ed573; }
+        .logo-text { font-size:2rem; font-weight:700; background:linear-gradient(90deg,#2ed573,#1e90ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .nav-buttons { display:flex; gap:20px; }
+        .nav-button { padding:12px 24px; background:rgba(30,144,255,0.1); border:1px solid rgba(30,144,255,0.3); border-radius:8px; color:#e0e0e0; text-decoration:none; font-weight:600; transition:0.3s; }
+        .nav-button:hover { background:rgba(30,144,255,0.2); transform:translateY(-3px); }
+        .nav-button i { margin-right:8px; }
+        .about-content { display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-bottom:60px; }
+        .about-text { padding:30px; background:rgba(20,25,40,0.6); border-radius:12px; border:1px solid rgba(46,213,115,0.2); line-height:1.8; }
+        .about-text h2 { font-size:2rem; margin-bottom:20px; color:#2ed573; }
+        .about-text p, .about-text li { color:#a0a0a0; margin-bottom:10px; }
+        .about-text ul { margin-left:20px; }
+        .about-image img { max-width:100%; border-radius:12px; border:1px solid #2ed57380; box-shadow:0 10px 30px #00000080; }
+        .section-title { font-size:2rem; margin-bottom:30px; color:#2ed573; text-align:center; }
+        .team-members { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:30px; margin-bottom:60px; }
+        .member-card { background:rgba(20,25,40,0.6); border-radius:12px; padding:30px; text-align:center; border:1px solid rgba(46,213,115,0.2); transition:0.3s; }
+        .member-card:hover { transform:translateY(-10px); border-color:#2ed573; }
+        .member-icon { font-size:3rem; color:#2ed573; margin-bottom:20px; }
+        .member-name { font-size:1.5rem; margin-bottom:10px; }
+        .role-badge { display:inline-block; background:rgba(46,213,115,0.2); color:#2ed573; padding:3px 8px; border-radius:4px; font-size:0.8rem; margin:2px; }
+        footer { text-align:center; padding:30px 0; border-top:1px solid rgba(46,213,115,0.3); margin-top:60px; }
+        .footer-link { color:#2ed573; text-decoration:none; }
+        @media (max-width:768px){ .about-content{ grid-template-columns:1fr; } .nav-buttons{ flex-direction:column; width:100%; } }
+    </style>
+</head>
+<body>
+<canvas class="matrix-canvas" id="matrixCanvas"></canvas>
+<div class="container">
+    <header>
+        <div class="logo"><i class="fas fa-code logo-icon"></i><div class="logo-text">Coding</div></div>
+        <div class="nav-buttons"><a href="index.html" class="nav-button"><i class="fas fa-home"></i> 主页</a></div>
+    </header>
+    <section class="about-content">
+        <div class="about-text"><h2>关于我们</h2><p>「代码即画笔，算法为诗行」</p><p>我们是一支来自中山一中的年轻编程团队，由热爱技术的开发者、算法探索者和创意极客组成。</p><h3>专注领域：</h3><ul><li>为校内社团活动提供技术支持（3D建模、小程序开发）</li><li>在GitHub维护校园代码库，共享教务系统优化方案</li></ul><p>加入我们：从零开始构建项目，用代码书写属于你的成长故事！</p></div>
+        <div class="about-image"><img src="https://cdn.luogu.com.cn/upload/image_hosting/kdlygl6g.png" alt="团队LOGO"></div>
+    </section>
+    <section class="team-section"><h2 class="section-title">团队核心成员</h2><div class="team-members"><div class="member-card"><i class="fas fa-user-secret member-icon"></i><h3 class="member-name">YY</h3><p><span class="role-badge">团队负责人</span><span class="role-badge">C++工程师</span></p><p class="member-desc">统筹管理，架构设计</p></div><div class="member-card"><i class="fas fa-code member-icon"></i><h3 class="member-name">ZZJ</h3><p><span class="role-badge">全栈</span><span class="role-badge">Python/C++</span><span class="role-badge">网站负责人</span></p><p>团队网站建设，全栈开发</p></div><div class="member-card"><i class="fas fa-cogs member-icon"></i><h3 class="member-name">CCX</h3><p><span class="role-badge">前端工程师</span><span class="role-badge">C++</span></p><p>UI/UX & 交互体验</p></div></div></section>
+    <section class="team-section"><h2 class="section-title">开发与测试团队</h2><div class="team-members"><div class="member-card"><i class="fas fa-bug member-icon"></i><h3>HBR</h3><p><span class="role-badge">C++/测试</span></p></div><div class="member-card"><i class="fas fa-terminal member-icon"></i><h3>LPL</h3><p><span class="role-badge">C++/测试</span></p></div><div class="member-card"><i class="fas fa-laptop-code member-icon"></i><h3>LJS</h3><p><span class="role-badge">C++/测试</span></p></div><div class="member-card"><i class="fas fa-cube member-icon"></i><h3>YJH</h3><p><span class="role-badge">C++/单元测试</span></p></div><div class="member-card"><i class="fas fa-shield-alt member-icon"></i><h3>HBZ</h3><p><span class="role-badge">C++/安全测试</span></p></div><div class="member-card"><i class="fas fa-rocket member-icon"></i><h3>PQX</h3><p><span class="role-badge">C++/性能优化</span></p></div></div></section>
+    <footer><p class="footer-text">Developed by <a href="https://zzjjack.us.kg" class="footer-link" target="_blank">ZZJ</a> and <a href="https://www.luogu.com.cn/team/104545" class="footer-link" target="_blank">Coding Team</a></p><p class="footer-text">2026, Coding</p></footer>
+</div>
+<script>
+    function matrixBg(){ const c=document.getElementById('matrixCanvas'),ctx=c.getContext('2d'); c.width=innerWidth;c.height=innerHeight; const fs=16,chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",cols=Math.floor(c.width/fs),drops=new Array(cols).fill(0); function draw(){ ctx.fillStyle='rgba(10,14,23,0.06)'; ctx.fillRect(0,0,c.width,c.height); ctx.fillStyle='#1e90ff'; ctx.font=`${fs}px monospace`; drops.forEach((y,i)=>{ ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*fs,y*fs); if(y*fs>c.height&&Math.random()>0.975) drops[i]=0; drops[i]++; }); requestAnimationFrame(draw); } window.addEventListener('resize',()=>{ c.width=innerWidth; c.height=innerHeight; }); draw(); }
+    window.addEventListener('load',matrixBg);
+</script>
+</body>
+</html>
