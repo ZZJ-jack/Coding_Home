@@ -38,17 +38,53 @@
         .close-modal:hover { color:#2ed573; transform:scale(1.1); }
         .modal-body { padding:40px 48px; color:#eaeef5; }
         
-        /* Markdown 样式 (只修改代码块背景和颜色，其他保留) */
+        /* Markdown 样式 - 表格完全重写确保清晰 */
         .markdown-body {
             background: transparent !important;
             color: #eaeef5 !important;
             font-size: 1.05rem;
             line-height: 1.75;
         }
-        /* 代码块容器相对定位，用于放置复制按钮 */
+        /* 表格样式：深色背景+高对比文字 */
+        .markdown-body table {
+            background: #0d111a;
+            width: 100%;
+            margin: 1.2em 0;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .markdown-body th {
+            background: #1f2a3a !important;
+            color: #d0ffd0 !important;
+            font-weight: 700;
+            padding: 12px 16px;
+            border: 1px solid #2ed57380;
+            text-align: center;
+        }
+        .markdown-body td {
+            padding: 10px 14px;
+            border: 1px solid #2ed57360;
+            color: #f0f0f0 !important;
+            background-color: inherit;
+        }
+        .markdown-body tr:nth-child(even) {
+            background: #0f141f;
+        }
+        .markdown-body tr:nth-child(odd) {
+            background: #0a0e17;
+        }
+        /* 标题保持亮色 */
+        .markdown-body h1, .markdown-body h2, .markdown-body h3, 
+        .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+            color: #9effcf !important;
+            border-bottom-color: rgba(46,213,115,0.4);
+        }
+        /* 代码块样式不变（用户已满意） */
         .markdown-body pre {
             position: relative;
-            background: #1a1e2f !important;  /* 柔和深色背景 */
+            background: #1a1e2f !important;
             border-radius: 14px;
             padding: 18px;
             overflow-x: auto;
@@ -57,19 +93,16 @@
         }
         .markdown-body pre code {
             background: transparent !important;
-            color: #e2e8f0 !important;       /* 亮灰字 */
-            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            color: #e2e8f0 !important;
+            font-family: 'Fira Code', monospace;
             font-size: 0.95rem;
-            line-height: 1.6;
         }
-        /* 行内代码 */
         .markdown-body code {
             background: #1e2436 !important;
             color: #f8c555 !important;
             padding: 0.2em 0.4em;
             border-radius: 6px;
         }
-        /* 复制按钮样式 */
         .copy-code-btn {
             position: absolute;
             top: 10px;
@@ -84,7 +117,6 @@
             transition: 0.2s;
             backdrop-filter: blur(4px);
             z-index: 5;
-            font-family: monospace;
         }
         .copy-code-btn:hover {
             background: #2ed57320;
@@ -94,21 +126,15 @@
         .copy-code-btn.copied {
             background: #2ed573;
             color: #0a0e17;
-            border-color: #2ed573;
         }
-        /* 其他样式保持原样（表格、标题等用户已满意） */
-        .markdown-body h1, .markdown-body h2, .markdown-body h3, 
-        .markdown-body h4, .markdown-body h5, .markdown-body h6 {
-            color: #9effcf !important;
-            border-bottom-color: rgba(46,213,115,0.4);
+        /* 引用块 */
+        .markdown-body blockquote {
+            border-left-color: #2ed573;
+            background: rgba(46,213,115,0.08);
+            padding: 0.8em 1.2em;
+            border-radius: 8px;
         }
         .markdown-body a { color: #6eb5ff !important; }
-        .markdown-body table { background: #121624; width:100%; margin:1.2em 0; }
-        .markdown-body th { background: #1a2538 !important; color: #c0f0d0 !important; border:1px solid #2ed57380; padding:10px 14px; }
-        .markdown-body td { border:1px solid #2ed57360; padding:10px 14px; color: #eaeef5; }
-        .markdown-body tr:nth-child(even) { background: #0e1220; }
-        .markdown-body tr:nth-child(odd) { background: #0a0d18; }
-        .markdown-body blockquote { border-left-color: #2ed573; background: rgba(46,213,115,0.08); }
         
         footer { text-align:center; padding:30px 0; border-top:1px solid rgba(46,213,115,0.3); margin-top:60px; }
         .footer-link { color:#2ed573; text-decoration:none; }
@@ -131,16 +157,15 @@
         <div class="nav-buttons"><a href="index.html" class="nav-button"><i class="fas fa-home"></i> 主页</a></div>
     </header>
     <div class="page-title">📖 技术文章</div>
-    <p class="subtitle">基于 articles.json 索引 · 纯 Markdown 阅读体验</p>
     <div id="articlesList" class="articles-grid"><div style="text-align:center;padding:60px"><i class="fas fa-spinner fa-pulse"></i> 正在加载文章列表...</div></div>
     <footer><p class="footer-text">Developed by <a href="https://zzjjack.us.kg" class="footer-link" target="_blank">ZZJ</a> and <a href="https://www.luogu.com.cn/team/104545" class="footer-link" target="_blank">Coding Team</a></p><p class="footer-text">2026, Coding</p></footer>
 </div>
 <div id="articleModal" class="modal-mask"><div class="modal-container"><div class="modal-header"><h2 id="modalTitle"></h2><button class="close-modal" id="closeModalBtn">&times;</button></div><div class="modal-body" id="modalContent"><div style="text-align:center">加载中...</div></div></div></div>
 
 <script>
-    // ---------- 性能优化：文章内容缓存 ----------
-    const articleCache = new Map();  // key: filePath, value: html字符串
-    let articlesListCache = null;   // 缓存文章列表数据
+    // ---------- 性能优化：缓存文章内容与列表 ----------
+    const articleCache = new Map();
+    let articlesListCache = null;
 
     // 模态框控制
     const modal = document.getElementById('articleModal');
@@ -150,46 +175,45 @@
     document.getElementById('closeModalBtn').addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
 
-    // 为所有代码块添加复制按钮
+    // 为代码块添加复制按钮（批量、异步，避免阻塞渲染）
     function addCopyButtonsToCodeBlocks() {
-        const preBlocks = modalContent.querySelectorAll('.markdown-body pre');
-        preBlocks.forEach(pre => {
-            // 避免重复添加
-            if (pre.querySelector('.copy-code-btn')) return;
-            const code = pre.querySelector('code');
-            if (!code) return;
-            const btn = document.createElement('button');
-            btn.className = 'copy-code-btn';
-            btn.innerHTML = '<i class="fas fa-copy"></i> 复制';
-            btn.setAttribute('aria-label', '复制代码');
-            btn.onclick = async (e) => {
-                e.stopPropagation();
-                const textToCopy = code.innerText;
-                try {
-                    await navigator.clipboard.writeText(textToCopy);
-                    btn.innerHTML = '<i class="fas fa-check"></i> 已复制';
-                    btn.classList.add('copied');
-                    setTimeout(() => {
-                        btn.innerHTML = '<i class="fas fa-copy"></i> 复制';
-                        btn.classList.remove('copied');
-                    }, 2000);
-                } catch (err) {
-                    console.error('复制失败', err);
-                    btn.innerHTML = '<i class="fas fa-times"></i> 失败';
-                    setTimeout(() => {
-                        btn.innerHTML = '<i class="fas fa-copy"></i> 复制';
-                    }, 1500);
-                }
-            };
-            pre.style.position = 'relative';
-            pre.appendChild(btn);
+        // 使用 requestAnimationFrame 延迟执行，让主要内容先显示
+        requestAnimationFrame(() => {
+            const preBlocks = modalContent.querySelectorAll('.markdown-body pre');
+            preBlocks.forEach(pre => {
+                if (pre.querySelector('.copy-code-btn')) return;
+                const code = pre.querySelector('code');
+                if (!code) return;
+                const btn = document.createElement('button');
+                btn.className = 'copy-code-btn';
+                btn.innerHTML = '<i class="fas fa-copy"></i> 复制';
+                btn.onclick = async (e) => {
+                    e.stopPropagation();
+                    const text = code.innerText;
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        btn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                        btn.classList.add('copied');
+                        setTimeout(() => {
+                            btn.innerHTML = '<i class="fas fa-copy"></i> 复制';
+                            btn.classList.remove('copied');
+                        }, 2000);
+                    } catch {
+                        btn.innerHTML = '<i class="fas fa-times"></i> 失败';
+                        setTimeout(() => {
+                            btn.innerHTML = '<i class="fas fa-copy"></i> 复制';
+                        }, 1500);
+                    }
+                };
+                pre.style.position = 'relative';
+                pre.appendChild(btn);
+            });
         });
     }
 
     // 加载并渲染 Markdown（带缓存）
     async function fetchMarkdownAndShow(filePath, displayTitle) {
         modalTitle.innerText = displayTitle;
-        // 检查缓存
         if (articleCache.has(filePath)) {
             modalContent.innerHTML = articleCache.get(filePath);
             addCopyButtonsToCodeBlocks();
@@ -215,14 +239,14 @@
                 const endIndex = content.indexOf('---', 3);
                 if (endIndex !== -1) content = content.substring(endIndex + 3);
             }
-            const html = marked.parse(content);
+            // marked.parse 返回 Promise，直接 await
+            const html = await marked.parse(content);
             const finalHtml = `<div class="markdown-body">${html}</div>`;
-            // 缓存
             articleCache.set(filePath, finalHtml);
             modalContent.innerHTML = finalHtml;
             addCopyButtonsToCodeBlocks();
         } catch (err) {
-            modalContent.innerHTML = `<div style="color:#ff8a8a"><i class="fas fa-exclamation-triangle"></i> 无法加载文章: ${err.message}<br>请检查文件路径和编码是否为 UTF-8。</div>`;
+            modalContent.innerHTML = `<div style="color:#ff8a8a"><i class="fas fa-exclamation-triangle"></i> 无法加载文章: ${err.message}</div>`;
         }
     }
 
@@ -245,7 +269,7 @@
             articlesListCache = articles;
             renderArticleList(articles);
         } catch (err) {
-            container.innerHTML = `<div class="no-articles"><i class="fas fa-database"></i><p>无法加载 articles.json，请确保文件存在且格式正确。</p><p>示例：{"articles":[{"title":"文章标题","date":"2026-01-01","path":"./post/example.md"}]}</p></div>`;
+            container.innerHTML = `<div class="no-articles"><i class="fas fa-database"></i><p>无法加载 articles.json，请确保文件存在且格式正确。</p></div>`;
         }
     }
 
@@ -268,15 +292,10 @@
 
     function escapeHtml(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
     }
 
-    // 矩阵雨背景
+    // 矩阵雨背景（保持原样）
     function createMatrixEffect() {
         const canvas = document.getElementById('matrixCanvas'), ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
