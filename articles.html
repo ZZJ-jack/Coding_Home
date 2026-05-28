@@ -6,9 +6,10 @@
     <title>技术博客 · Coding 文章</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown.min.css">
+    <!-- marked.js 使用最新稳定版 -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', 'Roboto', 'Noto Sans CJK SC', sans-serif; }
         body { background:#0a0e17; color:#e0e0e0; overflow-x:hidden; min-height:100vh; }
         .matrix-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; }
         .container { max-width:1200px; margin:0 auto; padding:20px; }
@@ -29,41 +30,57 @@
         .article-date { font-size:0.9rem; color:#2ed573; display:flex; align-items:center; gap:8px; }
         .no-articles { text-align:center; padding:60px; background:rgba(0,0,0,0.3); border-radius:24px; }
         
-        /* ========= 放大模态框 ========= */
-        .modal-mask { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:1000; display:flex; align-items:center; justify-content:center; visibility:hidden; opacity:0; transition:0.2s; }
+        /* 模态框 - 尺寸更大且颜色舒适 */
+        .modal-mask { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); backdrop-filter:blur(10px); z-index:1000; display:flex; align-items:center; justify-content:center; visibility:hidden; opacity:0; transition:0.2s; }
         .modal-container { 
-            width: 92%;
-            max-width: 1300px;       /* 原来 900px → 1300px，更宽敞 */
-            max-height: 90vh;        /* 原来 85vh → 90vh */
-            background:#10131f; 
+            width: 94%;
+            max-width: 1400px;       /* 宽敞阅读 */
+            max-height: 92vh;
+            background:#0c0f1a; 
             border-radius:28px; 
             border:1px solid #2ed573; 
             overflow-y:auto; 
             position:relative; 
             padding:0; 
-            box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.6);
         }
-        .modal-header { padding:22px 32px; border-bottom:1px solid rgba(46,213,115,0.3); display:flex; justify-content:space-between; align-items:center; background:#0c0f1a; border-radius:28px 28px 0 0; position:sticky; top:0; z-index:10; }
-        .modal-header h2 { color:#2ed573; font-size:1.7rem; font-weight:600; }
-        .close-modal { background:none; border:none; font-size:32px; color:#aaa; cursor:pointer; transition:0.2s; line-height:1; }
+        .modal-header { padding:22px 32px; border-bottom:1px solid rgba(46,213,115,0.4); display:flex; justify-content:space-between; align-items:center; background:#0a0d16; border-radius:28px 28px 0 0; position:sticky; top:0; z-index:10; }
+        .modal-header h2 { color:#2ed573; font-size:1.7rem; font-weight:600; letter-spacing:-0.3px; }
+        .close-modal { background:none; border:none; font-size:34px; color:#aaa; cursor:pointer; transition:0.2s; line-height:1; padding:0 10px; }
         .close-modal:hover { color:#2ed573; transform:scale(1.1); }
-        .modal-body { padding:36px 40px; color:#e0e0e0; }
+        .modal-body { padding:40px 48px; color:#eaeef5; }
         
-        /* 美化 markdown 正文区域，增大字体和行距 */
-        .markdown-body { background:transparent; color:#e0e0e0; font-size:1.05rem; line-height:1.7; }
-        .markdown-body pre { background:#1e2436; border-radius:14px; padding:16px; overflow-x:auto; }
-        .markdown-body code { background:#1e2436; padding:0.2em 0.4em; border-radius:6px; font-family:'Fira Code', monospace; }
-        .markdown-body table { border-collapse:collapse; width:100%; background:#1a1e2c; }
-        .markdown-body th, .markdown-body td { border:1px solid #2ed57380; padding:8px 12px; }
-        .markdown-body th { background:#0f1322; }
+        /* 重写 github-markdown-css 主题适配深色背景，保证中文清晰 */
+        .markdown-body {
+            background: transparent !important;
+            color: #eaeef5 !important;
+            font-size: 1.05rem;
+            line-height: 1.75;
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+        }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3, 
+        .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+            color: #c0f0d0 !important;
+            border-bottom-color: rgba(46,213,115,0.3);
+        }
+        .markdown-body a { color: #6eb5ff !important; }
+        .markdown-body code { background: #1a1f2e !important; color: #f0b27a !important; padding:0.2em 0.4em; border-radius:6px; font-family:'Fira Code', monospace; }
+        .markdown-body pre { background: #11151f !important; border-radius:14px; padding:18px; overflow-x:auto; }
+        .markdown-body pre code { background: transparent !important; color: #d6deeb !important; padding:0; }
+        .markdown-body table { background: #121624; border-collapse:collapse; width:100%; margin:1.2em 0; }
+        .markdown-body th, .markdown-body td { border:1px solid #2ed57380; padding:10px 14px; }
+        .markdown-body th { background: #1a2030; color:#e0e0e0; font-weight:600; }
+        .markdown-body tr:nth-child(even) { background: #0f1320; }
+        .markdown-body blockquote { border-left-color: #2ed573; color: #c0c5d0; background: rgba(46,213,115,0.05); }
         
         footer { text-align:center; padding:30px 0; border-top:1px solid rgba(46,213,115,0.3); margin-top:60px; }
         .footer-link { color:#2ed573; text-decoration:none; }
+        
         @media (max-width:768px){ 
             .nav-buttons{ flex-direction:column; width:100%; } 
             .article-title{ font-size:1.2rem; }
             .modal-container { width:96%; max-width:96%; }
-            .modal-body { padding:20px; }
+            .modal-body { padding:22px; }
             .modal-header h2 { font-size:1.3rem; }
         }
     </style>
@@ -83,7 +100,8 @@
 <div id="articleModal" class="modal-mask"><div class="modal-container"><div class="modal-header"><h2 id="modalTitle"></h2><button class="close-modal" id="closeModalBtn">&times;</button></div><div class="modal-body" id="modalContent"><div style="text-align:center">加载中...</div></div></div></div>
 
 <script>
-    // ---------- 模态框控制 ----------
+    // ---------- 确保 fetch 时使用 UTF-8 解码 ----------
+    // 模态框控制
     const modal = document.getElementById('articleModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalContent = document.getElementById('modalContent');
@@ -91,29 +109,41 @@
     document.getElementById('closeModalBtn').addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
 
-    // ---------- 加载并渲染 Markdown 文件（移除 YAML 头，仅用于内容展示，不解析元数据）----------
+    // 加载并渲染 Markdown 文件（自动处理编码）
     async function fetchMarkdownAndShow(filePath, displayTitle) {
         modalTitle.innerText = displayTitle;
         modalContent.innerHTML = '<div style="text-align:center"><i class="fas fa-spinner fa-pulse"></i> 加载文章内容...</div>';
         modal.style.visibility = 'visible';
         modal.style.opacity = '1';
         try {
+            // 显式请求 UTF-8 文本
             const resp = await fetch(filePath);
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            let raw = await resp.text();
-            // 移除开头的 YAML front matter（若有），避免显示多余的 --- 内容
-            if (raw.trim().startsWith('---')) {
-                const endIndex = raw.indexOf('---', 3);
-                if (endIndex !== -1) raw = raw.substring(endIndex + 3);
+            // 获取文本，浏览器默认按响应头解码，但若服务器未指定，可能乱码。我们强制使用 .text() 再处理？
+            // 实际 Response.text() 默认使用 UTF-8 解码，若服务器返回错误 charset 则有问题。
+            // 为保证万无一失，我们读取为 Blob 再转为 UTF-8 字符串
+            const blob = await resp.blob();
+            const raw = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsText(blob, 'UTF-8');
+            });
+            let content = raw;
+            // 移除 YAML front matter（若有）
+            if (content.trim().startsWith('---')) {
+                const endIndex = content.indexOf('---', 3);
+                if (endIndex !== -1) content = content.substring(endIndex + 3);
             }
-            const html = marked.parse(raw);
+            // 使用 marked 解析
+            const html = marked.parse(content);
             modalContent.innerHTML = `<div class="markdown-body">${html}</div>`;
         } catch (err) {
-            modalContent.innerHTML = `<div style="color:#ff8a8a"><i class="fas fa-exclamation-triangle"></i> 无法加载文章: ${err.message}</div>`;
+            modalContent.innerHTML = `<div style="color:#ff8a8a"><i class="fas fa-exclamation-triangle"></i> 无法加载文章: ${err.message}<br>请检查文件路径和编码是否为 UTF-8。</div>`;
         }
     }
 
-    // ---------- 从 articles.json 加载文章列表（唯一数据源）----------
+    // 从 articles.json 加载文章列表（唯一数据源）
     async function loadArticlesFromConfig() {
         const container = document.getElementById('articlesList');
         try {
@@ -160,7 +190,7 @@
         });
     }
 
-    // ---------- 矩阵雨背景特效 ----------
+    // 矩阵雨背景特效
     function createMatrixEffect() {
         const canvas = document.getElementById('matrixCanvas'), ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
